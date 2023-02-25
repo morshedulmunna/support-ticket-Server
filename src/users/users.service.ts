@@ -23,13 +23,22 @@ export class UsersService {
       throw new Error("Can't Find Any User");
     }
 
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      include: {
+        ticket: true,
+      },
+    });
   }
 
   async findOne(id: string, req: Request) {
     const decodedUserInfo = req.user as { id: string; email: string };
 
-    const foundUser = await this.prisma.user.findUnique({ where: { id } });
+    const foundUser = await this.prisma.user.findUnique({
+      include: {
+        ticket: true,
+      },
+      where: { id },
+    });
 
     if (!foundUser) {
       throw new NotFoundException();

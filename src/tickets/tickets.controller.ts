@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -21,7 +20,9 @@ export class TicketsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createTicketDto: CreateTicketDto, @Req() req) {
-    return this.ticketsService.create(createTicketDto, req);
+    const id = req.user.id;
+
+    return this.ticketsService.create(createTicketDto, id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -31,20 +32,8 @@ export class TicketsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ticketsService.findOne(+id);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
     return this.ticketsService.update(+id, updateTicketDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete()
-  remove(@Param('id') id: string) {
-    return this.ticketsService.remove();
   }
 }
