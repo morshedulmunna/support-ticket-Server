@@ -18,6 +18,10 @@ lerna-debug.log*
 /coverage
 /.nyc_output
 
+# Enviroment
+.env
+.env/loacl
+
 # IDEs and editors
 /.idea
 .project
