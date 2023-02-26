@@ -12,5 +12,5 @@ export class CreateTicketDto implements Prisma.TicketUncheckedCreateInput {
   status?: Status;
   @ApiProperty()
   description: string;
-  userId?: string;
+  userId: string;
 }

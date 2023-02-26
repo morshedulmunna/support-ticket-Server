@@ -38,6 +38,12 @@ model Ticket {
   subject     String
   status      Status   @default(open)
   description String
-  userId      String   @unique @db.ObjectId
+  userId      String   @db.ObjectId
   User        User?    @relation(fields: [userId], references: [id])
+}
+
+model Feedback {
+  feedback_Id String   @id @default(auto()) @map("_id") @db.ObjectId
+  feedback    String
+  submitDate  DateTime @default(now())
 }
