@@ -24,7 +24,23 @@ export class TicketsService {
     return this.prisma.ticket.findMany();
   }
 
-  update(id: number, updateTicketDto: UpdateTicketDto) {
-    return `This action updates a #${id} ticket`;
+  findOpenTickets() {
+    return this.prisma.ticket.findMany({ where: { status: 'open' } });
   }
+
+  findCloseTickets() {
+    return this.prisma.ticket.findMany({ where: { status: 'close' } });
+  }
+
+  async findSingleTickets(tiket_id: string) {
+    const foundUser = await this.prisma.ticket.findUnique({
+      where: { tiket_id },
+    });
+
+    return foundUser;
+  }
+
+  // update(id: number, updateTicketDto: UpdateTicketDto) {
+  //   return `This action updates a #${id} ticket`;
+  // }
 }

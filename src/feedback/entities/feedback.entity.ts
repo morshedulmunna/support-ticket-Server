@@ -1,1 +1,3 @@
-export class Feedback {}
+export class Feedback {
+  name: string;
+}

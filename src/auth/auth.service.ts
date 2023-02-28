@@ -14,8 +14,6 @@ export class AuthService {
   async signup(body: AuthDto) {
     const { email, password } = body;
 
-    console.log(body);
-
     // Handle Error
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
     if (foundUser) {
@@ -69,8 +67,8 @@ export class AuthService {
     res.cookie('token', token);
 
     return res.send({
-      Status: 200,
-      message: 'Login  is Successfully',
+      foundUser,
+      token,
     });
   }
 

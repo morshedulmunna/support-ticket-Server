@@ -31,19 +31,22 @@ model User {
 }
 
 model Ticket {
-  tiket_id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  tiket_id    String     @id @default(auto()) @map("_id") @db.ObjectId
   title       String
-  creaateDate DateTime @default(now())
-  updatedDate DateTime @updatedAt
+  creaateDate DateTime   @default(now())
+  updatedDate DateTime   @updatedAt
   subject     String
-  status      Status   @default(open)
+  status      Status     @default(open)
   description String
-  userId      String   @db.ObjectId
-  User        User?    @relation(fields: [userId], references: [id])
+  userId      String     @db.ObjectId
+  User        User?      @relation(fields: [userId], references: [id])
+  feedback    Feedback[]
 }
 
 model Feedback {
-  feedback_Id String   @id @default(auto()) @map("_id") @db.ObjectId
-  feedback    String
-  submitDate  DateTime @default(now())
+  feedback_Id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  feedback       String
+  submitDate     DateTime @default(now())
+  Ticket         Ticket?  @relation(fields: [ticketTiket_id], references: [tiket_id])
+  ticketTiket_id String   @db.ObjectId
 }

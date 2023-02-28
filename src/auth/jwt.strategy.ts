@@ -6,6 +6,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  //===========
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -16,13 +17,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  //=============
   private static extractJWT(req: Request): string | null {
+    console.log(req.cookies);
+
     if (req.cookies && 'token' in req.cookies) {
       return req.cookies.token;
     }
     return null;
   }
 
+  //=============
   async validate(payload: { id: string; email: string }) {
     return payload;
   }
