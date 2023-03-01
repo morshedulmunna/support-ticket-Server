@@ -17,6 +17,7 @@ import { GetCurrentUserById } from 'src/utils';
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
+  // Done | Specific customer can create this tickets
   @UseGuards(JwtAuthGuard)
   @Post()
   create(
@@ -26,29 +27,21 @@ export class TicketsController {
     return this.ticketsService.createTicket(createTicketDto, id);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  // Admin Get All Customers Tickets Here
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
-    return this.ticketsService.findAll();
+    return this.ticketsService.getAllTicket();
   }
 
+  // Get Tickets by Specific User.
   // @UseGuards(JwtAuthGuard)
-  @Get('open')
-  findOpenTickets() {
-    return this.ticketsService.findOpenTickets();
-  }
+  // @Get('user')
+  // findSingleTickets(@GetCurrentUserById() id: string) {
+  //   console.log(id);
 
-  // @UseGuards(JwtAuthGuard)
-  @Get('close')
-  findCloseTickets() {
-    return this.ticketsService.findCloseTickets();
-  }
-
-  // @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findSingleTickets(@Param('id') id: string) {
-    return this.ticketsService.findSingleTickets(id);
-  }
+  //   return this.ticketsService.getTicketId(id);
+  // }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
