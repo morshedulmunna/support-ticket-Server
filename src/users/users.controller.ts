@@ -1,5 +1,6 @@
-import { JwtAuthGuard } from './../auth/jwt.guard';
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { GetCurrentUserById } from '../utils';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -7,14 +8,15 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Get('all')
+  findAllUser(@GetCurrentUserById() id: string) {
+    return this.usersService.findAllUser(id);
   }
 
+  // Done
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string, @Req() req) {
-    return this.usersService.findOne(id, req);
+  @Get('single')
+  getSingleUser(@GetCurrentUserById() id: string) {
+    return this.usersService.getSingleUser(id);
   }
 }

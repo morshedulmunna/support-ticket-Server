@@ -5,7 +5,7 @@ export class CreateTicketDto implements Prisma.TicketUncheckedCreateInput {
   tiket_id?: string;
   @ApiProperty()
   title: string;
-  creaateDate?: string | Date;
+  createDate?: string | Date;
   updatedDate?: string | Date;
   @ApiProperty()
   subject: string;

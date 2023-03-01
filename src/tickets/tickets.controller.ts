@@ -10,18 +10,20 @@ import {
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { GetCurrentUserById } from 'src/utils';
 
 @Controller('tickets')
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createTicketDto: CreateTicketDto, @Req() req) {
-    const id = req.user.id;
-    return this.ticketsService.create(createTicketDto, id);
+  create(
+    @Body() createTicketDto: CreateTicketDto,
+    @GetCurrentUserById() id: string,
+  ) {
+    return this.ticketsService.createTicket(createTicketDto, id);
   }
 
   // @UseGuards(JwtAuthGuard)

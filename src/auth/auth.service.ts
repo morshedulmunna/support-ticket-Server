@@ -1,10 +1,15 @@
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthDto } from './dtio/auth.dto';
 import { jwt_secret } from 'src/utils/constant';
 import { Request, Response } from 'express';
+import { LoginAuthDto } from './dtio/loginAuth.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +17,7 @@ export class AuthService {
 
   //   Sign up User Service
   async signup(body: AuthDto) {
-    const { email, password } = body;
+    const { email, password, name } = body;
 
     // Handle Error
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
@@ -24,6 +29,7 @@ export class AuthService {
 
     await this.prisma.user.create({
       data: {
+        name,
         email,
         password: hashPassword,
       },
@@ -36,21 +42,22 @@ export class AuthService {
   }
 
   //   Sign In User Service
-  async signin(body: AuthDto, req: Request, res: Response) {
+  async signin(body: LoginAuthDto) {
     const { email, password } = body;
 
     // When User Not found
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
     if (!foundUser) {
-      throw new Error(`This email can't be register`);
+      throw new UnauthorizedException('user does not register');
     }
 
+    // Password Error Handling
     const isMatch = await this.comparePasswords({
       password,
       hash: foundUser.password,
     });
     if (!isMatch) {
-      throw new Error(`Wrong Register Person`);
+      throw new UnauthorizedException('password incorrect');
     }
 
     //signin then return JWT Token
@@ -64,12 +71,7 @@ export class AuthService {
       throw new ForbiddenException();
     }
 
-    res.cookie('token', token);
-
-    return res.send({
-      foundUser,
-      token,
-    });
+    return token;
   }
 
   //   Sign Out User Service
@@ -79,6 +81,10 @@ export class AuthService {
     return res.send({ message: 'Logout Success' });
   }
 
+  /**
+   *
+   *Custom Function
+   */
   //   Password Hash Function
   async hashPassword(pass: string) {
     const salt = await bcrypt.genSalt();
@@ -87,12 +93,10 @@ export class AuthService {
 
     return hash;
   }
-
   //   Compare Password Function
   async comparePasswords(args: { password: string; hash: string }) {
     return await bcrypt.compare(args.password, args.hash);
   }
-
   //   Generate Token Function
   async signToken(args: { id: string; email: string }) {
     const payload = args;
