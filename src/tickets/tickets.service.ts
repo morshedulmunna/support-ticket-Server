@@ -31,7 +31,6 @@ export class TicketsService {
   }
   // Admin Get All Customers Tickets Here
   async getSingleUserTicket(userId: string) {
-    console.log(userId);
     return this.prisma.ticket.findMany({ where: { userId } });
   }
 
