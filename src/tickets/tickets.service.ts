@@ -13,31 +13,27 @@ export class TicketsService {
     if (customer.roll !== 'customer') {
       throw new Error('Unauthorized User can not create tickets');
     }
-    await this.prisma.ticket.create({
+    return await this.prisma.ticket.create({
       data: {
         ...createTicketDto,
         userId: id,
       },
     });
-
-    return {
-      message: 'Ticket Create Successfully',
-    };
   }
 
   // Admin Get All Customers Tickets Here
-  getAllTicket() {
-    return this.prisma.ticket.findMany();
+  async getAllTicket(id: string) {
+    const admin = await this.prisma.user.findUnique({ where: { id } });
+
+    if (admin.roll === 'admin') {
+      return this.prisma.ticket.findMany();
+    }
   }
-
-  // Get Tickets by Specific User.
-  // async getTicketId(tiket_id: string) {
-  //   const foundUser = await this.prisma.ticket.findUnique({
-  //     where: { tiket_id },
-  //   });
-
-  //   return foundUser;
-  // }
+  // Admin Get All Customers Tickets Here
+  async getSingleUserTicket(userId: string) {
+    console.log(userId);
+    return this.prisma.ticket.findMany({ where: { userId } });
+  }
 
   // update(id: number, updateTicketDto: UpdateTicketDto) {
   //   return `This action updates a #${id} ticket`;

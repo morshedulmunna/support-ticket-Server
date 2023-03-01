@@ -2,17 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   // Cors Enable
-  app.enableCors({
-    origin: ['http://localhost:3000'],
-  });
-
-  app.use(cookieParser());
+  app.enableCors();
 
   // Validation Pipe Global
   app.useGlobalPipes(new ValidationPipe());
