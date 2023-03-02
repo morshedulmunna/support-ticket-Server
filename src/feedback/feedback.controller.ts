@@ -1,45 +1,26 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
 @Controller('feedback')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
-  @Post()
-  create(@Body() createFeedbackDto: CreateFeedbackDto) {
-    return this.feedbackService.create(createFeedbackDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.feedbackService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.feedbackService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
+  @UseGuards(JwtAuthGuard)
+  @Post(':id')
+  createFeedback(
+    @Body() createFeedbackDto: CreateFeedbackDto,
     @Param('id') id: string,
-    @Body() updateFeedbackDto: UpdateFeedbackDto,
   ) {
-    return this.feedbackService.update(+id, updateFeedbackDto);
+    console.log(createFeedbackDto);
+
+    return this.feedbackService.createFeedback(createFeedbackDto, id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.feedbackService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @Get(':ticket_id')
+  getFeedbackByTicketId(@Param('ticket_id') ticket_id: string) {
+    return this.feedbackService.getFeedbackByTicketId(ticket_id);
   }
 }

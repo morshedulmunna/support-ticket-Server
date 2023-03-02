@@ -1,26 +1,22 @@
+import { PrismaClient } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
 @Injectable()
 export class FeedbackService {
-  create(createFeedbackDto: CreateFeedbackDto) {
-    return 'This action adds a new feedback';
-  }
+  constructor(private prisma: PrismaClient) {}
 
-  findAll() {
-    return `This action returns all feedback`;
+  async createFeedback(createFeedbackDto: CreateFeedbackDto, tiket_id: string) {
+    return await this.prisma.feedback.create({
+      data: {
+        ...createFeedbackDto,
+        ticketTiket_id: tiket_id,
+      },
+    });
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} feedback`;
-  }
-
-  update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
-    return `This action updates a #${id} feedback`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} feedback`;
+  async getFeedbackByTicketId(ticketTiket_id: string) {
+    return await this.prisma.feedback.findMany({
+      where: { ticketTiket_id },
+    });
   }
 }

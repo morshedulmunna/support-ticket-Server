@@ -39,6 +39,9 @@ export class TicketsService {
   async getSingleTicketDetails(tiket_id: string) {
     const singleTicket = await this.prisma.ticket.findUnique({
       where: { tiket_id },
+      include: {
+        feedback: true,
+      },
     });
 
     return singleTicket;
