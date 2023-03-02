@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UpdateTicketDto } from './dto/update-ticket.dto';
 
 @Injectable()
 export class TicketsService {
@@ -35,7 +36,6 @@ export class TicketsService {
   }
 
   // Get Single Ticket Details
-
   async getSingleTicketDetails(tiket_id: string) {
     const singleTicket = await this.prisma.ticket.findUnique({
       where: { tiket_id },
@@ -43,7 +43,14 @@ export class TicketsService {
 
     return singleTicket;
   }
-  // update(id: number, updateTicketDto: UpdateTicketDto) {
-  //   return `This action updates a #${id} ticket`;
-  // }
-}
+
+  // Get ticketUpdate Service
+  async ticketUpdate(tiket_id: string, updateArticleDto: UpdateTicketDto) {
+    console.log(updateArticleDto);
+
+    return this.prisma.ticket.update({
+      where: { tiket_id },
+      data: updateArticleDto,
+    });
+  }
+

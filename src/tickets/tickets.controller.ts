@@ -5,13 +5,13 @@ import {
   Body,
   Patch,
   Param,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { GetCurrentUserById } from 'src/utils';
+import { UpdateTicketDto } from './dto/update-ticket.dto';
 
 @Controller('tickets')
 export class TicketsController {
@@ -41,11 +41,22 @@ export class TicketsController {
     return this.ticketsService.getSingleUserTicket(id);
   }
 
+  // Get Single Tickets by Id
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   getSingleTicketDetails(@Param('id') id: string) {
-    console.log(id);
-
     return this.ticketsService.getSingleTicketDetails(id);
+  }
+
+  // Update TIckets by Id
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  ticketUpdate(
+    @Param('id') id: string,
+    @Body() updateArticleDto: UpdateTicketDto,
+  ) {
+    console.log(id, updateArticleDto);
+
+    return this.ticketsService.ticketUpdate(id, updateArticleDto);
   }
 }
