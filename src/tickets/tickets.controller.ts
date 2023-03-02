@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
@@ -58,5 +59,12 @@ export class TicketsController {
     console.log(id, updateArticleDto);
 
     return this.ticketsService.ticketUpdate(id, updateArticleDto);
+  }
+
+  // Delete Ticket by ID
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  ticketRemove(@Param('id') id: string) {
+    return this.ticketsService.ticketRemove(id);
   }
 }

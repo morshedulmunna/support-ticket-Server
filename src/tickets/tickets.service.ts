@@ -53,4 +53,10 @@ export class TicketsService {
       data: updateArticleDto,
     });
   }
-
+  // Get ticketUpdate Service
+  async ticketRemove(tiket_id: string) {
+    return this.prisma.ticket.delete({
+      where: { tiket_id },
+    });
+  }
+}
