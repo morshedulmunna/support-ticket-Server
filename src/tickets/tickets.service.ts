@@ -34,6 +34,15 @@ export class TicketsService {
     return this.prisma.ticket.findMany({ where: { userId } });
   }
 
+  // Get Single Ticket Details
+
+  async getSingleTicketDetails(tiket_id: string) {
+    const singleTicket = await this.prisma.ticket.findUnique({
+      where: { tiket_id },
+    });
+
+    return singleTicket;
+  }
   // update(id: number, updateTicketDto: UpdateTicketDto) {
   //   return `This action updates a #${id} ticket`;
   // }

@@ -29,13 +29,23 @@ export class TicketsController {
 
   // Admin Get All Customers Tickets Here
   @UseGuards(JwtAuthGuard)
-  @Get('')
+  @Get()
   getAllTicket(@GetCurrentUserById() id: string) {
     return this.ticketsService.getAllTicket(id);
   }
+
+  // Single User All Tickets
   @UseGuards(JwtAuthGuard)
   @Get('single_user_ticket')
   getSingleUserTicket(@GetCurrentUserById() id: string) {
     return this.ticketsService.getSingleUserTicket(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  getSingleTicketDetails(@Param('id') id: string) {
+    console.log(id);
+
+    return this.ticketsService.getSingleTicketDetails(id);
   }
 }
