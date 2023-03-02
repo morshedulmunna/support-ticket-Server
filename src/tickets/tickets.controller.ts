@@ -56,8 +56,6 @@ export class TicketsController {
     @Param('id') id: string,
     @Body() updateArticleDto: UpdateTicketDto,
   ) {
-    console.log(id, updateArticleDto);
-
     return this.ticketsService.ticketUpdate(id, updateArticleDto);
   }
 

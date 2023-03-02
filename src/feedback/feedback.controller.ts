@@ -13,8 +13,6 @@ export class FeedbackController {
     @Body() createFeedbackDto: CreateFeedbackDto,
     @Param('id') id: string,
   ) {
-    console.log(createFeedbackDto);
-
     return this.feedbackService.createFeedback(createFeedbackDto, id);
   }
 

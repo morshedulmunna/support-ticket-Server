@@ -49,8 +49,6 @@ export class TicketsService {
 
   // Get ticketUpdate Service
   async ticketUpdate(tiket_id: string, updateArticleDto: UpdateTicketDto) {
-    console.log(updateArticleDto);
-
     return this.prisma.ticket.update({
       where: { tiket_id },
       data: updateArticleDto,
