@@ -22,12 +22,13 @@ enum Status {
 }
 
 model User {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
   name     String?
-  email    String   @unique
+  email    String     @unique
   password String
-  roll     Roll     @default(customer)
+  roll     Roll       @default(customer)
   ticket   Ticket[]
+  Feedback Feedback[]
 }
 
 model Ticket {
@@ -47,6 +48,8 @@ model Feedback {
   feedback_Id    String   @id @default(auto()) @map("_id") @db.ObjectId
   feedback       String
   submitDate     DateTime @default(now())
-  Ticket         Ticket?  @relation(fields: [ticketTiket_id], references: [tiket_id])
+  Ticket         Ticket?  @relation(fields: [ticketTiket_id], references: [tiket_id], onDelete: Cascade, onUpdate: Cascade)
   ticketTiket_id String   @db.ObjectId
+  userId         String   @db.ObjectId
+  User           User     @relation(fields: [userId], references: [id])
 }
