@@ -6,11 +6,16 @@ import { CreateFeedbackDto } from './dto/create-feedback.dto';
 export class FeedbackService {
   constructor(private prisma: PrismaClient) {}
 
-  async createFeedback(createFeedbackDto: CreateFeedbackDto, tiket_id: string) {
+  async createFeedback(
+    createFeedbackDto: CreateFeedbackDto,
+    tiket_id: string,
+    userId: string,
+  ) {
     return await this.prisma.feedback.create({
       data: {
         ...createFeedbackDto,
         ticketTiket_id: tiket_id,
+        userId: userId,
       },
     });
   }
