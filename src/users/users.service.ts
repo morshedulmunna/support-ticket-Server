@@ -54,6 +54,16 @@ export class UsersService {
   }
 
   async userUpdateForAdmin(id: string, roll, type: string) {
+    const existingSubject = await this.prisma.subject.findUnique({
+      where: {
+        userId: id,
+      },
+    });
+
+    if (existingSubject) {
+      throw new Error('Users Already have Admin Roll');
+    }
+
     return this.prisma.user.update({
       where: { id },
       data: {

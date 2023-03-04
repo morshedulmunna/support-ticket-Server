@@ -27,16 +27,17 @@ model User {
   email     String     @unique
   password  String
   roll      Roll       @default(customer)
-  subject   Subject?   @relation(fields: [subjectId], references: [id])
+  subject   Subject?
   ticket    Ticket[]
   Feedback  Feedback[]
-  subjectId String?    @db.ObjectId
+  subjectId String?    @unique @db.ObjectId
 }
 
 model Subject {
   id     String   @id @default(auto()) @map("_id") @db.ObjectId
   types  String
-  User   User[]
+  User   User     @relation(fields: [userId], references: [id])
+  userId String   @unique @db.ObjectId
   Ticket Ticket[]
 }
 
@@ -48,8 +49,8 @@ model Ticket {
   subject     Subject    @relation(fields: [subjectId], references: [id])
   status      Status     @default(open)
   description String
-  userId      String     @db.ObjectId
   User        User?      @relation(fields: [userId], references: [id])
+  userId      String     @db.ObjectId
   feedback    Feedback[]
   subjectId   String     @db.ObjectId
 }
