@@ -22,13 +22,22 @@ enum Status {
 }
 
 model User {
-  id       String     @id @default(auto()) @map("_id") @db.ObjectId
-  name     String?
-  email    String     @unique
-  password String
-  roll     Roll       @default(customer)
-  ticket   Ticket[]
-  Feedback Feedback[]
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  email     String     @unique
+  password  String
+  roll      Roll       @default(customer)
+  subject   Subject?   @relation(fields: [subjectId], references: [id])
+  ticket    Ticket[]
+  Feedback  Feedback[]
+  subjectId String?    @db.ObjectId
+}
+
+model Subject {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  types  String
+  User   User[]
+  Ticket Ticket[]
 }
 
 model Ticket {
@@ -36,20 +45,21 @@ model Ticket {
   title       String
   createDate  DateTime   @default(now())
   updatedDate DateTime   @updatedAt
-  subject     String
+  subject     Subject    @relation(fields: [subjectId], references: [id])
   status      Status     @default(open)
   description String
   userId      String     @db.ObjectId
   User        User?      @relation(fields: [userId], references: [id])
   feedback    Feedback[]
+  subjectId   String     @db.ObjectId
 }
 
 model Feedback {
-  feedback_Id    String   @id @default(auto()) @map("_id") @db.ObjectId
-  feedback       String
-  submitDate     DateTime @default(now())
-  Ticket         Ticket?  @relation(fields: [ticketTiket_id], references: [tiket_id], onDelete: Cascade, onUpdate: Cascade)
-  ticketTiket_id String   @db.ObjectId
-  userId         String   @db.ObjectId
-  User           User     @relation(fields: [userId], references: [id])
+  feedback_Id String   @id @default(auto()) @map("_id") @db.ObjectId
+  feedback    String
+  submitDate  DateTime @default(now())
+  Ticket      Ticket?  @relation(fields: [ticket_id], references: [tiket_id], onDelete: Cascade, onUpdate: Cascade)
+  ticket_id   String   @db.ObjectId
+  userId      String   @db.ObjectId
+  User        User     @relation(fields: [userId], references: [id])
 }

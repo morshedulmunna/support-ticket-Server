@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -50,5 +51,20 @@ export class UsersService {
     delete foundUser.password;
 
     return { foundUser };
+  }
+
+  async userUpdateForAdmin(id: string, roll, type: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        roll: roll,
+        subject: {
+          create: {
+            types: type,
+          },
+        },
+      },
+      include: { subject: true },
+    });
   }
 }

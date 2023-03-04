@@ -14,14 +14,14 @@ export class FeedbackService {
     return await this.prisma.feedback.create({
       data: {
         ...createFeedbackDto,
-        ticketTiket_id: tiket_id,
+        ticket_id: tiket_id,
         userId: userId,
       },
     });
   }
-  async getFeedbackByTicketId(ticketTiket_id: string) {
+  async getFeedbackByTicketId(ticket_id: string) {
     return await this.prisma.feedback.findMany({
-      where: { ticketTiket_id },
+      where: { ticket_id },
     });
   }
 }
