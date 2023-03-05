@@ -6,8 +6,7 @@ export class UpdateUserDto implements Prisma.UserUncheckedCreateInput {
   email: string;
   password: string;
   roll?: Roll;
+  subject?: string;
   ticket?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput;
   Feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput;
-  subjectId?: string;
-  type: string;
 }

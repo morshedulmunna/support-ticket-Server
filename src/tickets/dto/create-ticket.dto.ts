@@ -5,8 +5,8 @@ export class CreateTicketDto implements Prisma.TicketUncheckedCreateInput {
   title: string;
   createDate?: string | Date;
   updatedDate?: string | Date;
+  subject: string;
   status?: Status;
-  subjectId: string;
   description: string;
   userId: string;
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutTicketInput;

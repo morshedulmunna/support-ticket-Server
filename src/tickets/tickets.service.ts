@@ -1,4 +1,4 @@
-import { PrismaClient, Subject } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
@@ -26,13 +26,27 @@ export class TicketsService {
   async getAllTicket(id: string) {
     const admin = await this.prisma.user.findUnique({ where: { id } });
 
-    if (admin.roll === 'admin') {
-      return this.prisma.ticket.findMany();
+    if (admin.subject === null) {
+      const tickets = await this.prisma.ticket.findMany();
+      if (admin.roll === 'admin') {
+        return tickets;
+      }
+    } else {
+      const tickets = await this.prisma.ticket.findMany({
+        where: {
+          subject: admin.subject,
+        },
+      });
+      if (admin.roll === 'admin') {
+        return tickets;
+      }
     }
   }
-  // Admin Get All Customers Tickets Here
+
   async getSingleUserTicket(userId: string) {
-    return this.prisma.ticket.findMany({ where: { userId } });
+    return this.prisma.ticket.findMany({
+      where: { userId },
+    });
   }
 
   // Get Single Ticket Details
@@ -54,6 +68,7 @@ export class TicketsService {
       data: updateArticleDto,
     });
   }
+
   // Get ticketUpdate Service
   async ticketRemove(tiket_id: string) {
     return this.prisma.ticket.delete({

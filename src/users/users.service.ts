@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -53,28 +52,13 @@ export class UsersService {
     return { foundUser };
   }
 
-  async userUpdateForAdmin(id: string, roll, type: string) {
-    const existingSubject = await this.prisma.subject.findUnique({
-      where: {
-        userId: id,
-      },
-    });
-
-    if (existingSubject) {
-      throw new Error('Users Already have Admin Roll');
-    }
-
+  async userUpdateForAdmin(id: string, roll, subject: string) {
     return this.prisma.user.update({
       where: { id },
       data: {
         roll: roll,
-        subject: {
-          create: {
-            types: type,
-          },
-        },
+        subject: subject,
       },
-      include: { subject: true },
     });
   }
 }

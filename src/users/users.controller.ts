@@ -1,4 +1,3 @@
-import { SubjectDto } from './dto/create-subject.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { GetCurrentUserById } from '../utils';
 import {
@@ -42,8 +41,8 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     try {
-      const { roll, type } = updateUserDto;
-      return this.usersService.userUpdateForAdmin(id, roll, type);
+      const { roll, subject } = updateUserDto;
+      return this.usersService.userUpdateForAdmin(id, roll, subject);
     } catch {
       throw new NotFoundException('User Not Found');
     }
