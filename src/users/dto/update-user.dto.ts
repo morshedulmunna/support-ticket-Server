@@ -1,4 +1,12 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
+import { Roll, Prisma } from '@prisma/client';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+export class UpdateUserDto implements Prisma.UserUncheckedCreateInput {
+  id?: string;
+  name?: string;
+  email: string;
+  password: string;
+  roll?: Roll;
+  subject?: string;
+  ticket?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput;
+  Feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput;
+}
