@@ -22,23 +22,18 @@ export class AuthService {
     // Handle Error
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
     if (foundUser) {
-      throw new Error('Email Already Exist');
+      throw new UnauthorizedException('Email Already Exist');
     }
 
     const hashPassword = await this.hashPassword(password);
 
-    await this.prisma.user.create({
+    return await this.prisma.user.create({
       data: {
         name,
         email,
         password: hashPassword,
       },
     });
-
-    return {
-      status: 200,
-      message: 'Register Succuss',
-    };
   }
 
   //   Sign In User Service
@@ -50,7 +45,6 @@ export class AuthService {
     if (!foundUser) {
       throw new UnauthorizedException('user does not register');
     }
-
     // Password Error Handling
     const isMatch = await this.comparePasswords({
       password,
@@ -59,25 +53,29 @@ export class AuthService {
     if (!isMatch) {
       throw new UnauthorizedException('password incorrect');
     }
-
     //signin then return JWT Token
     const token = await this.signToken({
       id: foundUser.id,
       email: foundUser.email,
     });
-
     // If Token Not Found
     if (!token) {
       throw new ForbiddenException();
     }
-
-    return token;
+    return {
+      accessToken: token,
+      user: {
+        name: foundUser.name,
+        email: foundUser.email,
+        subject: foundUser.subject,
+        roll: foundUser.roll,
+      },
+    };
   }
 
   //   Sign Out User Service
   async signout(req: Request, res: Response) {
     res.clearCookie('token');
-
     return res.send({ message: 'Logout Success' });
   }
 
