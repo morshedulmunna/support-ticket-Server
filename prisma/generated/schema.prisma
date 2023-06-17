@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "./generated"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Roll {
+  customer
+  admin
+}
+
+enum Status {
+  open
+  close
+  resolved
+}
+
+model User {
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  name     String?
+  email    String     @unique
+  password String
+  roll     Roll       @default(customer)
+  subject  String?
+  ticket   Ticket[]
+  Feedback Feedback[]
+}
+
+model Ticket {
+  tiket_id    String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  createDate  DateTime   @default(now())
+  updatedDate DateTime   @updatedAt
+  subject     String
+  status      Status     @default(open)
+  description String
+  User        User?      @relation(fields: [userId], references: [id])
+  userId      String     @db.ObjectId
+  feedback    Feedback[]
+}
+
+model Feedback {
+  feedback_Id String   @id @default(auto()) @map("_id") @db.ObjectId
+  feedback    String
+  submitDate  DateTime @default(now())
+  Ticket      Ticket?  @relation(fields: [ticket_id], references: [tiket_id], onDelete: Cascade, onUpdate: Cascade)
+  ticket_id   String   @db.ObjectId
+  userId      String   @db.ObjectId
+  User        User     @relation(fields: [userId], references: [id])
+}

@@ -42,6 +42,7 @@ export class AuthService {
 
     // When User Not found
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
+
     if (!foundUser) {
       throw new UnauthorizedException('user does not register');
     }

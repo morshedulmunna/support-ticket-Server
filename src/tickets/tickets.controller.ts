@@ -42,6 +42,20 @@ export class TicketsController {
     return this.ticketsService.getSingleUserTicket(id);
   }
 
+  // Single User All Open Tickets
+  @UseGuards(JwtAuthGuard)
+  @Get('open-ticket')
+  getSingleUserOpenTicket(@GetCurrentUserById() id: string) {
+    return this.ticketsService.getSingleUserOpenTicket(id);
+  }
+
+  // Single User All Close Tickets
+  @UseGuards(JwtAuthGuard)
+  @Get('close-ticket')
+  getSingleUserCloseTicket(@GetCurrentUserById() id: string) {
+    return this.ticketsService.getSingleUserCloseTicket(id);
+  }
+
   // Get Single Tickets by Id
   @UseGuards(JwtAuthGuard)
   @Get(':id')

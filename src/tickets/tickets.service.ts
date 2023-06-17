@@ -49,6 +49,29 @@ export class TicketsService {
     });
   }
 
+  // aLL open tickets
+  async getSingleUserOpenTicket(userId: string) {
+    return this.prisma.ticket.findMany({
+      where: {
+        AND: {
+          status: 'open',
+          userId,
+        },
+      },
+    });
+  }
+  // aLL Close tickets
+  async getSingleUserCloseTicket(userId: string) {
+    return this.prisma.ticket.findMany({
+      where: {
+        AND: {
+          status: 'close',
+          userId,
+        },
+      },
+    });
+  }
+
   // Get Single Ticket Details
   async getSingleTicketDetails(tiket_id: string) {
     const singleTicket = await this.prisma.ticket.findUnique({
