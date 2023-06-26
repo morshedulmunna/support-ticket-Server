@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { Module } from '@nestjs/common';
-import { TicketsService } from './tickets.service';
+import { PrismaClient } from 'prisma/generated';
 import { TicketsController } from './tickets.controller';
+import { TicketsService } from './tickets.service';
 
 @Module({
   controllers: [TicketsController],

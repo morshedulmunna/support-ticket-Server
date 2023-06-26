@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
+import { PrismaClient } from 'prisma/generated';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 
 @Injectable()

@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
+import { PrismaClient } from 'prisma/generated';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 

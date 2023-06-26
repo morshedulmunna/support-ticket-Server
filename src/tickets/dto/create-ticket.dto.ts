@@ -1,4 +1,5 @@
-import { Prisma, Status } from '@prisma/client';
+// eslint-disable-next-line prettier/prettier
+import { Prisma, Status } from 'prisma/generated';
 
 export class CreateTicketDto implements Prisma.TicketUncheckedCreateInput {
   tiket_id?: string;

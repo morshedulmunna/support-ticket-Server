@@ -162,7 +162,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Projects\\support-ticket\\Support-Ticket-System-Server\\prisma\\generated",
+      "value": "E:\\Projects\\support-software\\support-ticket-server\\prisma\\generated",
       "fromEnvVar": null
     },
     "config": {

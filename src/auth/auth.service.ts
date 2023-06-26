@@ -1,14 +1,14 @@
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
 import {
   ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthDto } from './dtio/auth.dto';
-import { jwt_secret } from 'src/utils/constant';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
+import { PrismaClient } from 'prisma/generated';
+import { jwt_secret } from 'src/utils/constant';
+import { AuthDto } from './dtio/auth.dto';
 import { LoginAuthDto } from './dtio/loginAuth.dto';
 
 @Injectable()

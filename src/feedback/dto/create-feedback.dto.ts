@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated';
 
 export class CreateFeedbackDto implements Prisma.FeedbackUncheckedCreateInput {
   ticket_id: string;

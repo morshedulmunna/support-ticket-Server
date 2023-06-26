@@ -1,4 +1,4 @@
-import { Roll, Prisma } from '@prisma/client';
+import { Prisma, Roll } from 'prisma/generated';
 
 export class UpdateUserDto implements Prisma.UserUncheckedCreateInput {
   id?: string;

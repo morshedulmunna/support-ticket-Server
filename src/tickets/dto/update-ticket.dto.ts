@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
+import { Prisma, Status } from 'prisma/generated';
 import { CreateTicketDto } from './create-ticket.dto';
-import { Prisma, Status } from '@prisma/client';
 
 export class UpdateTicketDto extends PartialType(CreateTicketDto) {
   tiket_id?: string;

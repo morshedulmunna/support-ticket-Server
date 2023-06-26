@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 import {
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { PrismaClient } from 'prisma/generated';
 
 @Injectable()
 export class UsersService {

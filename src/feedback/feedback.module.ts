@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { Module } from '@nestjs/common';
-import { FeedbackService } from './feedback.service';
+import { PrismaClient } from 'prisma/generated';
 import { FeedbackController } from './feedback.controller';
+import { FeedbackService } from './feedback.service';
 
 @Module({
   controllers: [FeedbackController],
