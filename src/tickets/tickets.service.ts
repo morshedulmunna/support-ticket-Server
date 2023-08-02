@@ -60,6 +60,7 @@ export class TicketsService {
       },
     });
   }
+
   // aLL Close tickets
   async getSingleUserCloseTicket(userId: string) {
     return this.prisma.ticket.findMany({

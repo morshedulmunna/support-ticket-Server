@@ -1,18 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  UseGuards,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { TicketsService } from './tickets.service';
-import { CreateTicketDto } from './dto/create-ticket.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { GetCurrentUserById } from 'src/utils';
+import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { TicketsService } from './tickets.service';
 
 @Controller('tickets')
 export class TicketsController {
