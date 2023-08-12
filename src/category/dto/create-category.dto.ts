@@ -6,9 +6,4 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   @IsString()
   public type: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  public assign_to: string;
 }

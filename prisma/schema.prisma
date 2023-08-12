@@ -33,16 +33,15 @@ model User {
   createAt   DateTime   @default(now())
   ticket     Ticket[]
   Feedback   Feedback[]
+  assign_to  Category?  @relation(fields: [categoryID], references: [categoryID])
   categoryID String?
-  Category   Category[]
 }
 
 model Category {
   categoryID String   @id @default(cuid())
-  type       String
-  assign_to  User     @relation(fields: [userId], references: [id])
+  type       String   @unique
   Ticket     Ticket[]
-  userId     String   @unique
+  User       User[]
 }
 
 model Ticket {
