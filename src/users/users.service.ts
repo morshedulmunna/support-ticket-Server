@@ -25,8 +25,14 @@ export class UsersService {
     }
 
     return this.prisma.user.findMany({
-      include: {
-        ticket: true,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        roll: true,
+      },
+      orderBy: {
+        createAt: 'desc',
       },
     });
   }
@@ -52,16 +58,27 @@ export class UsersService {
     return { foundUser };
   }
 
-  async userUpdateForAdmin(id: string, roll, category: string) {
+  async userUpdateForAdmin(id: string, roll: any) {
     return this.prisma.user.update({
       where: { id },
       data: {
-        roll: roll,
-        category: {
-          create: {
-            type: category,
-          },
-        },
+        roll,
+      },
+    });
+  }
+
+  async assistance(id: string) {
+    const foundUser = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (foundUser.roll !== 'admin') {
+      throw new Error('Can not getting assistance info');
+    }
+
+    return this.prisma.user.findMany({
+      where: {
+        roll: 'assistance',
       },
     });
   }

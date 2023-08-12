@@ -26,6 +26,17 @@ export class UsersController {
     }
   }
 
+  // assistance User Getting by only admin
+  @UseGuards(JwtAuthGuard)
+  @Get('/assistance')
+  assistance(@GetCurrentUserById() id: string) {
+    try {
+      return this.usersService.assistance(id);
+    } catch {
+      throw new NotFoundException('User Not Found');
+    }
+  }
+
   // Done
   @UseGuards(JwtAuthGuard)
   @Get('single')
@@ -42,7 +53,7 @@ export class UsersController {
   ) {
     try {
       const { roll, subject } = updateUserDto;
-      return this.usersService.userUpdateForAdmin(id, roll, subject);
+      return this.usersService.userUpdateForAdmin(id, roll);
     } catch {
       throw new NotFoundException('User Not Found');
     }

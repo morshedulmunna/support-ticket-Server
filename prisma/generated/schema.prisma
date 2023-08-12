@@ -14,6 +14,7 @@ datasource db {
 
 enum Roll {
   customer
+  assistance
   admin
 }
 
@@ -29,17 +30,19 @@ model User {
   email      String     @unique
   password   String
   roll       Roll       @default(customer)
-  category   Category?  @relation(fields: [categoryID], references: [categoryID])
+  createAt   DateTime   @default(now())
   ticket     Ticket[]
   Feedback   Feedback[]
   categoryID String?
+  Category   Category[]
 }
 
 model Category {
   categoryID String   @id @default(cuid())
   type       String
+  assign_to  User     @relation(fields: [userId], references: [id])
   Ticket     Ticket[]
-  User       User[]
+  userId     String   @unique
 }
 
 model Ticket {

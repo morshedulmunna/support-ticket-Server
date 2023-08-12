@@ -91,12 +91,14 @@ function makeEnum(x) { return x; }
 
 exports.Prisma.CategoryOrderByRelevanceFieldEnum = makeEnum({
   categoryID: 'categoryID',
-  type: 'type'
+  type: 'type',
+  userId: 'userId'
 });
 
 exports.Prisma.CategoryScalarFieldEnum = makeEnum({
   categoryID: 'categoryID',
-  type: 'type'
+  type: 'type',
+  userId: 'userId'
 });
 
 exports.Prisma.FeedbackOrderByRelevanceFieldEnum = makeEnum({
@@ -164,10 +166,12 @@ exports.Prisma.UserScalarFieldEnum = makeEnum({
   email: 'email',
   password: 'password',
   roll: 'roll',
+  createAt: 'createAt',
   categoryID: 'categoryID'
 });
 exports.Roll = makeEnum({
   customer: 'customer',
+  assistance: 'assistance',
   admin: 'admin'
 });
 
