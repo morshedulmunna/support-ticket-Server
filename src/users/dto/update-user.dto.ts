@@ -1,6 +1,7 @@
 import { Prisma, Roll } from 'prisma/generated';
 
 export class UpdateUserDto implements Prisma.UserUncheckedCreateInput {
+  categoryID: string;
   id?: string;
   name?: string;
   email: string;

@@ -20,7 +20,16 @@ export type User = {
   email: string
   password: string
   roll: Roll
-  subject: string | null
+  categoryID: string | null
+}
+
+/**
+ * Model Category
+ * 
+ */
+export type Category = {
+  categoryID: string
+  type: string
 }
 
 /**
@@ -32,7 +41,7 @@ export type Ticket = {
   title: string
   createDate: Date
   updatedDate: Date
-  subject: string
+  categoryID: string
   status: Status
   description: string
   userId: string
@@ -130,6 +139,52 @@ export class PrismaClient<
   $use(cb: Prisma.Middleware): void
 
 /**
+   * Executes a prepared raw query and returns the number of affected rows.
+   * @example
+   * ```
+   * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
+   * ```
+   * 
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
+
+  /**
+   * Executes a raw query and returns the number of affected rows.
+   * Susceptible to SQL injections, see documentation.
+   * @example
+   * ```
+   * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
+   * ```
+   * 
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
+
+  /**
+   * Performs a prepared raw query and returns the `SELECT` data.
+   * @example
+   * ```
+   * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
+   * ```
+   * 
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
+
+  /**
+   * Performs a raw query and returns the `SELECT` data.
+   * Susceptible to SQL injections, see documentation.
+   * @example
+   * ```
+   * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
+   * ```
+   * 
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
+
+  /**
    * Allows the running of a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.
    * @example
    * ```
@@ -142,24 +197,9 @@ export class PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P]): Promise<UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): Promise<UnwrapTuple<P>>
 
-  $transaction<R>(fn: (prisma: Omit<this, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => Promise<R>, options?: { maxWait?: number, timeout?: number }): Promise<R>
-
-  /**
-   * Executes a raw MongoDB command and returns the result of it.
-   * @example
-   * ```
-   * const user = await prisma.$runCommandRaw({
-   *   aggregate: 'User',
-   *   pipeline: [{ $match: { name: 'Bob' } }, { $project: { email: true, _id: false } }],
-   *   explain: false,
-   * })
-   * ```
-   * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
-   */
-  $runCommandRaw(command: Prisma.InputJsonObject): Prisma.PrismaPromise<Prisma.JsonObject>
+  $transaction<R>(fn: (prisma: Omit<this, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => Promise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): Promise<R>
 
       /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
@@ -170,6 +210,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<GlobalReject>;
+
+  /**
+   * `prisma.category`: Exposes CRUD operations for the **Category** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Categories
+    * const categories = await prisma.category.findMany()
+    * ```
+    */
+  get category(): Prisma.CategoryDelegate<GlobalReject>;
 
   /**
    * `prisma.ticket`: Exposes CRUD operations for the **Ticket** model.
@@ -660,6 +710,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    Category: 'Category',
     Ticket: 'Ticket',
     Feedback: 'Feedback'
   };
@@ -868,6 +919,51 @@ export namespace Prisma {
 
 
   /**
+   * Count Type CategoryCountOutputType
+   */
+
+
+  export type CategoryCountOutputType = {
+    Ticket: number
+    User: number
+  }
+
+  export type CategoryCountOutputTypeSelect = {
+    Ticket?: boolean
+    User?: boolean
+  }
+
+  export type CategoryCountOutputTypeGetPayload<S extends boolean | null | undefined | CategoryCountOutputTypeArgs> =
+    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
+    S extends true ? CategoryCountOutputType :
+    S extends undefined ? never :
+    S extends { include: any } & (CategoryCountOutputTypeArgs)
+    ? CategoryCountOutputType 
+    : S extends { select: any } & (CategoryCountOutputTypeArgs)
+      ? {
+    [P in TruthyKeys<S['select']>]:
+    P extends keyof CategoryCountOutputType ? CategoryCountOutputType[P] : never
+  } 
+      : CategoryCountOutputType
+
+
+
+
+  // Custom InputTypes
+
+  /**
+   * CategoryCountOutputType without action
+   */
+  export type CategoryCountOutputTypeArgs = {
+    /**
+     * Select specific fields to fetch from the CategoryCountOutputType
+     */
+    select?: CategoryCountOutputTypeSelect | null
+  }
+
+
+
+  /**
    * Count Type TicketCountOutputType
    */
 
@@ -931,7 +1027,7 @@ export namespace Prisma {
     email: string | null
     password: string | null
     roll: Roll | null
-    subject: string | null
+    categoryID: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -940,7 +1036,7 @@ export namespace Prisma {
     email: string | null
     password: string | null
     roll: Roll | null
-    subject: string | null
+    categoryID: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -949,7 +1045,7 @@ export namespace Prisma {
     email: number
     password: number
     roll: number
-    subject: number
+    categoryID: number
     _all: number
   }
 
@@ -960,7 +1056,7 @@ export namespace Prisma {
     email?: true
     password?: true
     roll?: true
-    subject?: true
+    categoryID?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -969,7 +1065,7 @@ export namespace Prisma {
     email?: true
     password?: true
     roll?: true
-    subject?: true
+    categoryID?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -978,7 +1074,7 @@ export namespace Prisma {
     email?: true
     password?: true
     roll?: true
-    subject?: true
+    categoryID?: true
     _all?: true
   }
 
@@ -992,7 +1088,7 @@ export namespace Prisma {
      * 
      * Determine the order of Users to fetch.
      */
-    orderBy?: Enumerable<UserOrderByWithRelationInput>
+    orderBy?: Enumerable<UserOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -1061,7 +1157,7 @@ export namespace Prisma {
     email: string
     password: string
     roll: Roll
-    subject: string | null
+    categoryID: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1087,14 +1183,16 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     roll?: boolean
-    subject?: boolean
+    category?: boolean | CategoryArgs
     ticket?: boolean | User$ticketArgs
     Feedback?: boolean | User$FeedbackArgs
+    categoryID?: boolean
     _count?: boolean | UserCountOutputTypeArgs
   }
 
 
   export type UserInclude = {
+    category?: boolean | CategoryArgs
     ticket?: boolean | User$ticketArgs
     Feedback?: boolean | User$FeedbackArgs
     _count?: boolean | UserCountOutputTypeArgs
@@ -1107,6 +1205,7 @@ export namespace Prisma {
     S extends { include: any } & (UserArgs | UserFindManyArgs)
     ? User  & {
     [P in TruthyKeys<S['include']>]:
+        P extends 'category' ? CategoryGetPayload<S['include'][P]> | null :
         P extends 'ticket' ? Array < TicketGetPayload<S['include'][P]>>  :
         P extends 'Feedback' ? Array < FeedbackGetPayload<S['include'][P]>>  :
         P extends '_count' ? UserCountOutputTypeGetPayload<S['include'][P]> :  never
@@ -1114,6 +1213,7 @@ export namespace Prisma {
     : S extends { select: any } & (UserArgs | UserFindManyArgs)
       ? {
     [P in TruthyKeys<S['select']>]:
+        P extends 'category' ? CategoryGetPayload<S['select'][P]> | null :
         P extends 'ticket' ? Array < TicketGetPayload<S['select'][P]>>  :
         P extends 'Feedback' ? Array < FeedbackGetPayload<S['select'][P]>>  :
         P extends '_count' ? UserCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof User ? User[P] : never
@@ -1340,33 +1440,6 @@ export namespace Prisma {
     ): Prisma__UserClient<UserGetPayload<T>>
 
     /**
-     * Find zero or more Users that matches the filter.
-     * @param {UserFindRawArgs} args - Select which filters you would like to apply.
-     * @example
-     * const user = await prisma.user.findRaw({
-     *   filter: { age: { $gt: 25 } } 
-     * })
-    **/
-    findRaw(
-      args?: UserFindRawArgs
-    ): Prisma.PrismaPromise<JsonObject>
-
-    /**
-     * Perform aggregation operations on a User.
-     * @param {UserAggregateRawArgs} args - Select which aggregations you would like to apply.
-     * @example
-     * const user = await prisma.user.aggregateRaw({
-     *   pipeline: [
-     *     { $match: { status: "registered" } },
-     *     { $group: { _id: "$country", total: { $sum: 1 } } }
-     *   ]
-     * })
-    **/
-    aggregateRaw(
-      args?: UserAggregateRawArgs
-    ): Prisma.PrismaPromise<JsonObject>
-
-    /**
      * Count the number of Users.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
@@ -1515,6 +1588,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
+    category<T extends CategoryArgs= {}>(args?: Subset<T, CategoryArgs>): Prisma__CategoryClient<CategoryGetPayload<T> | Null>;
+
     ticket<T extends User$ticketArgs= {}>(args?: Subset<T, User$ticketArgs>): Prisma.PrismaPromise<Array<TicketGetPayload<T>>| Null>;
 
     Feedback<T extends User$FeedbackArgs= {}>(args?: Subset<T, User$FeedbackArgs>): Prisma.PrismaPromise<Array<FeedbackGetPayload<T>>| Null>;
@@ -1616,7 +1691,7 @@ export namespace Prisma {
      * 
      * Determine the order of Users to fetch.
      */
-    orderBy?: Enumerable<UserOrderByWithRelationInput>
+    orderBy?: Enumerable<UserOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -1676,7 +1751,7 @@ export namespace Prisma {
      * 
      * Determine the order of Users to fetch.
      */
-    orderBy?: Enumerable<UserOrderByWithRelationInput>
+    orderBy?: Enumerable<UserOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -1725,7 +1800,7 @@ export namespace Prisma {
      * 
      * Determine the order of Users to fetch.
      */
-    orderBy?: Enumerable<UserOrderByWithRelationInput>
+    orderBy?: Enumerable<UserOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -1775,6 +1850,7 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: Enumerable<UserCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -1874,36 +1950,6 @@ export namespace Prisma {
 
 
   /**
-   * User findRaw
-   */
-  export type UserFindRawArgs = {
-    /**
-     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
-     */
-    filter?: InputJsonValue
-    /**
-     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
-     */
-    options?: InputJsonValue
-  }
-
-
-  /**
-   * User aggregateRaw
-   */
-  export type UserAggregateRawArgs = {
-    /**
-     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
-     */
-    pipeline?: InputJsonValue[]
-    /**
-     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
-     */
-    options?: InputJsonValue
-  }
-
-
-  /**
    * User.ticket
    */
   export type User$ticketArgs = {
@@ -1916,7 +1962,7 @@ export namespace Prisma {
      */
     include?: TicketInclude | null
     where?: TicketWhereInput
-    orderBy?: Enumerable<TicketOrderByWithRelationInput>
+    orderBy?: Enumerable<TicketOrderByWithRelationAndSearchRelevanceInput>
     cursor?: TicketWhereUniqueInput
     take?: number
     skip?: number
@@ -1937,7 +1983,7 @@ export namespace Prisma {
      */
     include?: FeedbackInclude | null
     where?: FeedbackWhereInput
-    orderBy?: Enumerable<FeedbackOrderByWithRelationInput>
+    orderBy?: Enumerable<FeedbackOrderByWithRelationAndSearchRelevanceInput>
     cursor?: FeedbackWhereUniqueInput
     take?: number
     skip?: number
@@ -1962,6 +2008,965 @@ export namespace Prisma {
 
 
   /**
+   * Model Category
+   */
+
+
+  export type AggregateCategory = {
+    _count: CategoryCountAggregateOutputType | null
+    _min: CategoryMinAggregateOutputType | null
+    _max: CategoryMaxAggregateOutputType | null
+  }
+
+  export type CategoryMinAggregateOutputType = {
+    categoryID: string | null
+    type: string | null
+  }
+
+  export type CategoryMaxAggregateOutputType = {
+    categoryID: string | null
+    type: string | null
+  }
+
+  export type CategoryCountAggregateOutputType = {
+    categoryID: number
+    type: number
+    _all: number
+  }
+
+
+  export type CategoryMinAggregateInputType = {
+    categoryID?: true
+    type?: true
+  }
+
+  export type CategoryMaxAggregateInputType = {
+    categoryID?: true
+    type?: true
+  }
+
+  export type CategoryCountAggregateInputType = {
+    categoryID?: true
+    type?: true
+    _all?: true
+  }
+
+  export type CategoryAggregateArgs = {
+    /**
+     * Filter which Category to aggregate.
+     */
+    where?: CategoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Categories to fetch.
+     */
+    orderBy?: Enumerable<CategoryOrderByWithRelationAndSearchRelevanceInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CategoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Categories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Categories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Categories
+    **/
+    _count?: true | CategoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CategoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CategoryMaxAggregateInputType
+  }
+
+  export type GetCategoryAggregateType<T extends CategoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateCategory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCategory[P]>
+      : GetScalarType<T[P], AggregateCategory[P]>
+  }
+
+
+
+
+  export type CategoryGroupByArgs = {
+    where?: CategoryWhereInput
+    orderBy?: Enumerable<CategoryOrderByWithAggregationInput>
+    by: CategoryScalarFieldEnum[]
+    having?: CategoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CategoryCountAggregateInputType | true
+    _min?: CategoryMinAggregateInputType
+    _max?: CategoryMaxAggregateInputType
+  }
+
+
+  export type CategoryGroupByOutputType = {
+    categoryID: string
+    type: string
+    _count: CategoryCountAggregateOutputType | null
+    _min: CategoryMinAggregateOutputType | null
+    _max: CategoryMaxAggregateOutputType | null
+  }
+
+  type GetCategoryGroupByPayload<T extends CategoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickArray<CategoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CategoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CategoryGroupByOutputType[P]>
+            : GetScalarType<T[P], CategoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CategorySelect = {
+    categoryID?: boolean
+    type?: boolean
+    Ticket?: boolean | Category$TicketArgs
+    User?: boolean | Category$UserArgs
+    _count?: boolean | CategoryCountOutputTypeArgs
+  }
+
+
+  export type CategoryInclude = {
+    Ticket?: boolean | Category$TicketArgs
+    User?: boolean | Category$UserArgs
+    _count?: boolean | CategoryCountOutputTypeArgs
+  }
+
+  export type CategoryGetPayload<S extends boolean | null | undefined | CategoryArgs> =
+    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
+    S extends true ? Category :
+    S extends undefined ? never :
+    S extends { include: any } & (CategoryArgs | CategoryFindManyArgs)
+    ? Category  & {
+    [P in TruthyKeys<S['include']>]:
+        P extends 'Ticket' ? Array < TicketGetPayload<S['include'][P]>>  :
+        P extends 'User' ? Array < UserGetPayload<S['include'][P]>>  :
+        P extends '_count' ? CategoryCountOutputTypeGetPayload<S['include'][P]> :  never
+  } 
+    : S extends { select: any } & (CategoryArgs | CategoryFindManyArgs)
+      ? {
+    [P in TruthyKeys<S['select']>]:
+        P extends 'Ticket' ? Array < TicketGetPayload<S['select'][P]>>  :
+        P extends 'User' ? Array < UserGetPayload<S['select'][P]>>  :
+        P extends '_count' ? CategoryCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof Category ? Category[P] : never
+  } 
+      : Category
+
+
+  type CategoryCountArgs = 
+    Omit<CategoryFindManyArgs, 'select' | 'include'> & {
+      select?: CategoryCountAggregateInputType | true
+    }
+
+  export interface CategoryDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
+
+    /**
+     * Find zero or one Category that matches the filter.
+     * @param {CategoryFindUniqueArgs} args - Arguments to find a Category
+     * @example
+     * // Get one Category
+     * const category = await prisma.category.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends CategoryFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, CategoryFindUniqueArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Category'> extends True ? Prisma__CategoryClient<CategoryGetPayload<T>> : Prisma__CategoryClient<CategoryGetPayload<T> | null, null>
+
+    /**
+     * Find one Category that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {CategoryFindUniqueOrThrowArgs} args - Arguments to find a Category
+     * @example
+     * // Get one Category
+     * const category = await prisma.category.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends CategoryFindUniqueOrThrowArgs>(
+      args?: SelectSubset<T, CategoryFindUniqueOrThrowArgs>
+    ): Prisma__CategoryClient<CategoryGetPayload<T>>
+
+    /**
+     * Find the first Category that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CategoryFindFirstArgs} args - Arguments to find a Category
+     * @example
+     * // Get one Category
+     * const category = await prisma.category.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends CategoryFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, CategoryFindFirstArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Category'> extends True ? Prisma__CategoryClient<CategoryGetPayload<T>> : Prisma__CategoryClient<CategoryGetPayload<T> | null, null>
+
+    /**
+     * Find the first Category that matches the filter or
+     * throw `NotFoundError` if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CategoryFindFirstOrThrowArgs} args - Arguments to find a Category
+     * @example
+     * // Get one Category
+     * const category = await prisma.category.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends CategoryFindFirstOrThrowArgs>(
+      args?: SelectSubset<T, CategoryFindFirstOrThrowArgs>
+    ): Prisma__CategoryClient<CategoryGetPayload<T>>
+
+    /**
+     * Find zero or more Categories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CategoryFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Categories
+     * const categories = await prisma.category.findMany()
+     * 
+     * // Get first 10 Categories
+     * const categories = await prisma.category.findMany({ take: 10 })
+     * 
+     * // Only select the `categoryID`
+     * const categoryWithCategoryIDOnly = await prisma.category.findMany({ select: { categoryID: true } })
+     * 
+    **/
+    findMany<T extends CategoryFindManyArgs>(
+      args?: SelectSubset<T, CategoryFindManyArgs>
+    ): Prisma.PrismaPromise<Array<CategoryGetPayload<T>>>
+
+    /**
+     * Create a Category.
+     * @param {CategoryCreateArgs} args - Arguments to create a Category.
+     * @example
+     * // Create one Category
+     * const Category = await prisma.category.create({
+     *   data: {
+     *     // ... data to create a Category
+     *   }
+     * })
+     * 
+    **/
+    create<T extends CategoryCreateArgs>(
+      args: SelectSubset<T, CategoryCreateArgs>
+    ): Prisma__CategoryClient<CategoryGetPayload<T>>
+
+    /**
+     * Create many Categories.
+     *     @param {CategoryCreateManyArgs} args - Arguments to create many Categories.
+     *     @example
+     *     // Create many Categories
+     *     const category = await prisma.category.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CategoryCreateManyArgs>(
+      args?: SelectSubset<T, CategoryCreateManyArgs>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Category.
+     * @param {CategoryDeleteArgs} args - Arguments to delete one Category.
+     * @example
+     * // Delete one Category
+     * const Category = await prisma.category.delete({
+     *   where: {
+     *     // ... filter to delete one Category
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends CategoryDeleteArgs>(
+      args: SelectSubset<T, CategoryDeleteArgs>
+    ): Prisma__CategoryClient<CategoryGetPayload<T>>
+
+    /**
+     * Update one Category.
+     * @param {CategoryUpdateArgs} args - Arguments to update one Category.
+     * @example
+     * // Update one Category
+     * const category = await prisma.category.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends CategoryUpdateArgs>(
+      args: SelectSubset<T, CategoryUpdateArgs>
+    ): Prisma__CategoryClient<CategoryGetPayload<T>>
+
+    /**
+     * Delete zero or more Categories.
+     * @param {CategoryDeleteManyArgs} args - Arguments to filter Categories to delete.
+     * @example
+     * // Delete a few Categories
+     * const { count } = await prisma.category.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends CategoryDeleteManyArgs>(
+      args?: SelectSubset<T, CategoryDeleteManyArgs>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Categories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CategoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Categories
+     * const category = await prisma.category.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends CategoryUpdateManyArgs>(
+      args: SelectSubset<T, CategoryUpdateManyArgs>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Category.
+     * @param {CategoryUpsertArgs} args - Arguments to update or create a Category.
+     * @example
+     * // Update or create a Category
+     * const category = await prisma.category.upsert({
+     *   create: {
+     *     // ... data to create a Category
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Category we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends CategoryUpsertArgs>(
+      args: SelectSubset<T, CategoryUpsertArgs>
+    ): Prisma__CategoryClient<CategoryGetPayload<T>>
+
+    /**
+     * Count the number of Categories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CategoryCountArgs} args - Arguments to filter Categories to count.
+     * @example
+     * // Count the number of Categories
+     * const count = await prisma.category.count({
+     *   where: {
+     *     // ... the filter for the Categories we want to count
+     *   }
+     * })
+    **/
+    count<T extends CategoryCountArgs>(
+      args?: Subset<T, CategoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends _Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CategoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Category.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CategoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CategoryAggregateArgs>(args: Subset<T, CategoryAggregateArgs>): Prisma.PrismaPromise<GetCategoryAggregateType<T>>
+
+    /**
+     * Group by Category.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CategoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CategoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CategoryGroupByArgs['orderBy'] }
+        : { orderBy?: CategoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CategoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCategoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Category.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__CategoryClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+    private readonly _dmmf;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+    constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+
+    Ticket<T extends Category$TicketArgs= {}>(args?: Subset<T, Category$TicketArgs>): Prisma.PrismaPromise<Array<TicketGetPayload<T>>| Null>;
+
+    User<T extends Category$UserArgs= {}>(args?: Subset<T, Category$UserArgs>): Prisma.PrismaPromise<Array<UserGetPayload<T>>| Null>;
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+
+
+  // Custom InputTypes
+
+  /**
+   * Category base type for findUnique actions
+   */
+  export type CategoryFindUniqueArgsBase = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * Filter, which Category to fetch.
+     */
+    where: CategoryWhereUniqueInput
+  }
+
+  /**
+   * Category findUnique
+   */
+  export interface CategoryFindUniqueArgs extends CategoryFindUniqueArgsBase {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Category findUniqueOrThrow
+   */
+  export type CategoryFindUniqueOrThrowArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * Filter, which Category to fetch.
+     */
+    where: CategoryWhereUniqueInput
+  }
+
+
+  /**
+   * Category base type for findFirst actions
+   */
+  export type CategoryFindFirstArgsBase = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * Filter, which Category to fetch.
+     */
+    where?: CategoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Categories to fetch.
+     */
+    orderBy?: Enumerable<CategoryOrderByWithRelationAndSearchRelevanceInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Categories.
+     */
+    cursor?: CategoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Categories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Categories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Categories.
+     */
+    distinct?: Enumerable<CategoryScalarFieldEnum>
+  }
+
+  /**
+   * Category findFirst
+   */
+  export interface CategoryFindFirstArgs extends CategoryFindFirstArgsBase {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Category findFirstOrThrow
+   */
+  export type CategoryFindFirstOrThrowArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * Filter, which Category to fetch.
+     */
+    where?: CategoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Categories to fetch.
+     */
+    orderBy?: Enumerable<CategoryOrderByWithRelationAndSearchRelevanceInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Categories.
+     */
+    cursor?: CategoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Categories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Categories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Categories.
+     */
+    distinct?: Enumerable<CategoryScalarFieldEnum>
+  }
+
+
+  /**
+   * Category findMany
+   */
+  export type CategoryFindManyArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * Filter, which Categories to fetch.
+     */
+    where?: CategoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Categories to fetch.
+     */
+    orderBy?: Enumerable<CategoryOrderByWithRelationAndSearchRelevanceInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Categories.
+     */
+    cursor?: CategoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Categories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Categories.
+     */
+    skip?: number
+    distinct?: Enumerable<CategoryScalarFieldEnum>
+  }
+
+
+  /**
+   * Category create
+   */
+  export type CategoryCreateArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * The data needed to create a Category.
+     */
+    data: XOR<CategoryCreateInput, CategoryUncheckedCreateInput>
+  }
+
+
+  /**
+   * Category createMany
+   */
+  export type CategoryCreateManyArgs = {
+    /**
+     * The data used to create many Categories.
+     */
+    data: Enumerable<CategoryCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * Category update
+   */
+  export type CategoryUpdateArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * The data needed to update a Category.
+     */
+    data: XOR<CategoryUpdateInput, CategoryUncheckedUpdateInput>
+    /**
+     * Choose, which Category to update.
+     */
+    where: CategoryWhereUniqueInput
+  }
+
+
+  /**
+   * Category updateMany
+   */
+  export type CategoryUpdateManyArgs = {
+    /**
+     * The data used to update Categories.
+     */
+    data: XOR<CategoryUpdateManyMutationInput, CategoryUncheckedUpdateManyInput>
+    /**
+     * Filter which Categories to update
+     */
+    where?: CategoryWhereInput
+  }
+
+
+  /**
+   * Category upsert
+   */
+  export type CategoryUpsertArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * The filter to search for the Category to update in case it exists.
+     */
+    where: CategoryWhereUniqueInput
+    /**
+     * In case the Category found by the `where` argument doesn't exist, create a new Category with this data.
+     */
+    create: XOR<CategoryCreateInput, CategoryUncheckedCreateInput>
+    /**
+     * In case the Category was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CategoryUpdateInput, CategoryUncheckedUpdateInput>
+  }
+
+
+  /**
+   * Category delete
+   */
+  export type CategoryDeleteArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+    /**
+     * Filter which Category to delete.
+     */
+    where: CategoryWhereUniqueInput
+  }
+
+
+  /**
+   * Category deleteMany
+   */
+  export type CategoryDeleteManyArgs = {
+    /**
+     * Filter which Categories to delete
+     */
+    where?: CategoryWhereInput
+  }
+
+
+  /**
+   * Category.Ticket
+   */
+  export type Category$TicketArgs = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TicketInclude | null
+    where?: TicketWhereInput
+    orderBy?: Enumerable<TicketOrderByWithRelationAndSearchRelevanceInput>
+    cursor?: TicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<TicketScalarFieldEnum>
+  }
+
+
+  /**
+   * Category.User
+   */
+  export type Category$UserArgs = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserInclude | null
+    where?: UserWhereInput
+    orderBy?: Enumerable<UserOrderByWithRelationAndSearchRelevanceInput>
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<UserScalarFieldEnum>
+  }
+
+
+  /**
+   * Category without action
+   */
+  export type CategoryArgs = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: CategoryInclude | null
+  }
+
+
+
+  /**
    * Model Ticket
    */
 
@@ -1977,7 +2982,7 @@ export namespace Prisma {
     title: string | null
     createDate: Date | null
     updatedDate: Date | null
-    subject: string | null
+    categoryID: string | null
     status: Status | null
     description: string | null
     userId: string | null
@@ -1988,7 +2993,7 @@ export namespace Prisma {
     title: string | null
     createDate: Date | null
     updatedDate: Date | null
-    subject: string | null
+    categoryID: string | null
     status: Status | null
     description: string | null
     userId: string | null
@@ -1999,7 +3004,7 @@ export namespace Prisma {
     title: number
     createDate: number
     updatedDate: number
-    subject: number
+    categoryID: number
     status: number
     description: number
     userId: number
@@ -2012,7 +3017,7 @@ export namespace Prisma {
     title?: true
     createDate?: true
     updatedDate?: true
-    subject?: true
+    categoryID?: true
     status?: true
     description?: true
     userId?: true
@@ -2023,7 +3028,7 @@ export namespace Prisma {
     title?: true
     createDate?: true
     updatedDate?: true
-    subject?: true
+    categoryID?: true
     status?: true
     description?: true
     userId?: true
@@ -2034,7 +3039,7 @@ export namespace Prisma {
     title?: true
     createDate?: true
     updatedDate?: true
-    subject?: true
+    categoryID?: true
     status?: true
     description?: true
     userId?: true
@@ -2051,7 +3056,7 @@ export namespace Prisma {
      * 
      * Determine the order of Tickets to fetch.
      */
-    orderBy?: Enumerable<TicketOrderByWithRelationInput>
+    orderBy?: Enumerable<TicketOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -2119,7 +3124,7 @@ export namespace Prisma {
     title: string
     createDate: Date
     updatedDate: Date
-    subject: string
+    categoryID: string
     status: Status
     description: string
     userId: string
@@ -2147,7 +3152,8 @@ export namespace Prisma {
     title?: boolean
     createDate?: boolean
     updatedDate?: boolean
-    subject?: boolean
+    category?: boolean | CategoryArgs
+    categoryID?: boolean
     status?: boolean
     description?: boolean
     User?: boolean | UserArgs
@@ -2158,6 +3164,7 @@ export namespace Prisma {
 
 
   export type TicketInclude = {
+    category?: boolean | CategoryArgs
     User?: boolean | UserArgs
     feedback?: boolean | Ticket$feedbackArgs
     _count?: boolean | TicketCountOutputTypeArgs
@@ -2170,6 +3177,7 @@ export namespace Prisma {
     S extends { include: any } & (TicketArgs | TicketFindManyArgs)
     ? Ticket  & {
     [P in TruthyKeys<S['include']>]:
+        P extends 'category' ? CategoryGetPayload<S['include'][P]> | null :
         P extends 'User' ? UserGetPayload<S['include'][P]> | null :
         P extends 'feedback' ? Array < FeedbackGetPayload<S['include'][P]>>  :
         P extends '_count' ? TicketCountOutputTypeGetPayload<S['include'][P]> :  never
@@ -2177,6 +3185,7 @@ export namespace Prisma {
     : S extends { select: any } & (TicketArgs | TicketFindManyArgs)
       ? {
     [P in TruthyKeys<S['select']>]:
+        P extends 'category' ? CategoryGetPayload<S['select'][P]> | null :
         P extends 'User' ? UserGetPayload<S['select'][P]> | null :
         P extends 'feedback' ? Array < FeedbackGetPayload<S['select'][P]>>  :
         P extends '_count' ? TicketCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof Ticket ? Ticket[P] : never
@@ -2403,33 +3412,6 @@ export namespace Prisma {
     ): Prisma__TicketClient<TicketGetPayload<T>>
 
     /**
-     * Find zero or more Tickets that matches the filter.
-     * @param {TicketFindRawArgs} args - Select which filters you would like to apply.
-     * @example
-     * const ticket = await prisma.ticket.findRaw({
-     *   filter: { age: { $gt: 25 } } 
-     * })
-    **/
-    findRaw(
-      args?: TicketFindRawArgs
-    ): Prisma.PrismaPromise<JsonObject>
-
-    /**
-     * Perform aggregation operations on a Ticket.
-     * @param {TicketAggregateRawArgs} args - Select which aggregations you would like to apply.
-     * @example
-     * const ticket = await prisma.ticket.aggregateRaw({
-     *   pipeline: [
-     *     { $match: { status: "registered" } },
-     *     { $group: { _id: "$country", total: { $sum: 1 } } }
-     *   ]
-     * })
-    **/
-    aggregateRaw(
-      args?: TicketAggregateRawArgs
-    ): Prisma.PrismaPromise<JsonObject>
-
-    /**
      * Count the number of Tickets.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
@@ -2578,6 +3560,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
+    category<T extends CategoryArgs= {}>(args?: Subset<T, CategoryArgs>): Prisma__CategoryClient<CategoryGetPayload<T> | Null>;
+
     User<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
 
     feedback<T extends Ticket$feedbackArgs= {}>(args?: Subset<T, Ticket$feedbackArgs>): Prisma.PrismaPromise<Array<FeedbackGetPayload<T>>| Null>;
@@ -2679,7 +3663,7 @@ export namespace Prisma {
      * 
      * Determine the order of Tickets to fetch.
      */
-    orderBy?: Enumerable<TicketOrderByWithRelationInput>
+    orderBy?: Enumerable<TicketOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -2739,7 +3723,7 @@ export namespace Prisma {
      * 
      * Determine the order of Tickets to fetch.
      */
-    orderBy?: Enumerable<TicketOrderByWithRelationInput>
+    orderBy?: Enumerable<TicketOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -2788,7 +3772,7 @@ export namespace Prisma {
      * 
      * Determine the order of Tickets to fetch.
      */
-    orderBy?: Enumerable<TicketOrderByWithRelationInput>
+    orderBy?: Enumerable<TicketOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -2838,6 +3822,7 @@ export namespace Prisma {
      * The data used to create many Tickets.
      */
     data: Enumerable<TicketCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -2937,36 +3922,6 @@ export namespace Prisma {
 
 
   /**
-   * Ticket findRaw
-   */
-  export type TicketFindRawArgs = {
-    /**
-     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
-     */
-    filter?: InputJsonValue
-    /**
-     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
-     */
-    options?: InputJsonValue
-  }
-
-
-  /**
-   * Ticket aggregateRaw
-   */
-  export type TicketAggregateRawArgs = {
-    /**
-     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
-     */
-    pipeline?: InputJsonValue[]
-    /**
-     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
-     */
-    options?: InputJsonValue
-  }
-
-
-  /**
    * Ticket.feedback
    */
   export type Ticket$feedbackArgs = {
@@ -2979,7 +3934,7 @@ export namespace Prisma {
      */
     include?: FeedbackInclude | null
     where?: FeedbackWhereInput
-    orderBy?: Enumerable<FeedbackOrderByWithRelationInput>
+    orderBy?: Enumerable<FeedbackOrderByWithRelationAndSearchRelevanceInput>
     cursor?: FeedbackWhereUniqueInput
     take?: number
     skip?: number
@@ -3075,7 +4030,7 @@ export namespace Prisma {
      * 
      * Determine the order of Feedbacks to fetch.
      */
-    orderBy?: Enumerable<FeedbackOrderByWithRelationInput>
+    orderBy?: Enumerable<FeedbackOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -3417,33 +4372,6 @@ export namespace Prisma {
     ): Prisma__FeedbackClient<FeedbackGetPayload<T>>
 
     /**
-     * Find zero or more Feedbacks that matches the filter.
-     * @param {FeedbackFindRawArgs} args - Select which filters you would like to apply.
-     * @example
-     * const feedback = await prisma.feedback.findRaw({
-     *   filter: { age: { $gt: 25 } } 
-     * })
-    **/
-    findRaw(
-      args?: FeedbackFindRawArgs
-    ): Prisma.PrismaPromise<JsonObject>
-
-    /**
-     * Perform aggregation operations on a Feedback.
-     * @param {FeedbackAggregateRawArgs} args - Select which aggregations you would like to apply.
-     * @example
-     * const feedback = await prisma.feedback.aggregateRaw({
-     *   pipeline: [
-     *     { $match: { status: "registered" } },
-     *     { $group: { _id: "$country", total: { $sum: 1 } } }
-     *   ]
-     * })
-    **/
-    aggregateRaw(
-      args?: FeedbackAggregateRawArgs
-    ): Prisma.PrismaPromise<JsonObject>
-
-    /**
      * Count the number of Feedbacks.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
@@ -3693,7 +4621,7 @@ export namespace Prisma {
      * 
      * Determine the order of Feedbacks to fetch.
      */
-    orderBy?: Enumerable<FeedbackOrderByWithRelationInput>
+    orderBy?: Enumerable<FeedbackOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -3753,7 +4681,7 @@ export namespace Prisma {
      * 
      * Determine the order of Feedbacks to fetch.
      */
-    orderBy?: Enumerable<FeedbackOrderByWithRelationInput>
+    orderBy?: Enumerable<FeedbackOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -3802,7 +4730,7 @@ export namespace Prisma {
      * 
      * Determine the order of Feedbacks to fetch.
      */
-    orderBy?: Enumerable<FeedbackOrderByWithRelationInput>
+    orderBy?: Enumerable<FeedbackOrderByWithRelationAndSearchRelevanceInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
@@ -3852,6 +4780,7 @@ export namespace Prisma {
      * The data used to create many Feedbacks.
      */
     data: Enumerable<FeedbackCreateManyInput>
+    skipDuplicates?: boolean
   }
 
 
@@ -3951,36 +4880,6 @@ export namespace Prisma {
 
 
   /**
-   * Feedback findRaw
-   */
-  export type FeedbackFindRawArgs = {
-    /**
-     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
-     */
-    filter?: InputJsonValue
-    /**
-     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
-     */
-    options?: InputJsonValue
-  }
-
-
-  /**
-   * Feedback aggregateRaw
-   */
-  export type FeedbackAggregateRawArgs = {
-    /**
-     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
-     */
-    pipeline?: InputJsonValue[]
-    /**
-     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
-     */
-    options?: InputJsonValue
-  }
-
-
-  /**
    * Feedback without action
    */
   export type FeedbackArgs = {
@@ -4002,6 +4901,32 @@ export namespace Prisma {
 
   // Based on
   // https://github.com/microsoft/TypeScript/issues/3192#issuecomment-261720275
+
+  export const CategoryOrderByRelevanceFieldEnum: {
+    categoryID: 'categoryID',
+    type: 'type'
+  };
+
+  export type CategoryOrderByRelevanceFieldEnum = (typeof CategoryOrderByRelevanceFieldEnum)[keyof typeof CategoryOrderByRelevanceFieldEnum]
+
+
+  export const CategoryScalarFieldEnum: {
+    categoryID: 'categoryID',
+    type: 'type'
+  };
+
+  export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+  export const FeedbackOrderByRelevanceFieldEnum: {
+    feedback_Id: 'feedback_Id',
+    feedback: 'feedback',
+    ticket_id: 'ticket_id',
+    userId: 'userId'
+  };
+
+  export type FeedbackOrderByRelevanceFieldEnum = (typeof FeedbackOrderByRelevanceFieldEnum)[keyof typeof FeedbackOrderByRelevanceFieldEnum]
+
 
   export const FeedbackScalarFieldEnum: {
     feedback_Id: 'feedback_Id',
@@ -4030,12 +4955,23 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const TicketOrderByRelevanceFieldEnum: {
+    tiket_id: 'tiket_id',
+    title: 'title',
+    categoryID: 'categoryID',
+    description: 'description',
+    userId: 'userId'
+  };
+
+  export type TicketOrderByRelevanceFieldEnum = (typeof TicketOrderByRelevanceFieldEnum)[keyof typeof TicketOrderByRelevanceFieldEnum]
+
+
   export const TicketScalarFieldEnum: {
     tiket_id: 'tiket_id',
     title: 'title',
     createDate: 'createDate',
     updatedDate: 'updatedDate',
-    subject: 'subject',
+    categoryID: 'categoryID',
     status: 'status',
     description: 'description',
     userId: 'userId'
@@ -4044,13 +4980,34 @@ export namespace Prisma {
   export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
 
 
+  export const TransactionIsolationLevel: {
+    ReadUncommitted: 'ReadUncommitted',
+    ReadCommitted: 'ReadCommitted',
+    RepeatableRead: 'RepeatableRead',
+    Serializable: 'Serializable'
+  };
+
+  export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+  export const UserOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    password: 'password',
+    categoryID: 'categoryID'
+  };
+
+  export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
   export const UserScalarFieldEnum: {
     id: 'id',
     name: 'name',
     email: 'email',
     password: 'password',
     roll: 'roll',
-    subject: 'subject'
+    categoryID: 'categoryID'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -4070,20 +5027,23 @@ export namespace Prisma {
     email?: StringFilter | string
     password?: StringFilter | string
     roll?: EnumRollFilter | Roll
-    subject?: StringNullableFilter | string | null
+    category?: XOR<CategoryRelationFilter, CategoryWhereInput> | null
     ticket?: TicketListRelationFilter
     Feedback?: FeedbackListRelationFilter
+    categoryID?: StringNullableFilter | string | null
   }
 
-  export type UserOrderByWithRelationInput = {
+  export type UserOrderByWithRelationAndSearchRelevanceInput = {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
     password?: SortOrder
     roll?: SortOrder
-    subject?: SortOrder
+    category?: CategoryOrderByWithRelationAndSearchRelevanceInput
     ticket?: TicketOrderByRelationAggregateInput
     Feedback?: FeedbackOrderByRelationAggregateInput
+    categoryID?: SortOrder
+    _relevance?: UserOrderByRelevanceInput
   }
 
   export type UserWhereUniqueInput = {
@@ -4097,7 +5057,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     roll?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -4112,7 +5072,45 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter | string
     password?: StringWithAggregatesFilter | string
     roll?: EnumRollWithAggregatesFilter | Roll
-    subject?: StringNullableWithAggregatesFilter | string | null
+    categoryID?: StringNullableWithAggregatesFilter | string | null
+  }
+
+  export type CategoryWhereInput = {
+    AND?: Enumerable<CategoryWhereInput>
+    OR?: Enumerable<CategoryWhereInput>
+    NOT?: Enumerable<CategoryWhereInput>
+    categoryID?: StringFilter | string
+    type?: StringFilter | string
+    Ticket?: TicketListRelationFilter
+    User?: UserListRelationFilter
+  }
+
+  export type CategoryOrderByWithRelationAndSearchRelevanceInput = {
+    categoryID?: SortOrder
+    type?: SortOrder
+    Ticket?: TicketOrderByRelationAggregateInput
+    User?: UserOrderByRelationAggregateInput
+    _relevance?: CategoryOrderByRelevanceInput
+  }
+
+  export type CategoryWhereUniqueInput = {
+    categoryID?: string
+  }
+
+  export type CategoryOrderByWithAggregationInput = {
+    categoryID?: SortOrder
+    type?: SortOrder
+    _count?: CategoryCountOrderByAggregateInput
+    _max?: CategoryMaxOrderByAggregateInput
+    _min?: CategoryMinOrderByAggregateInput
+  }
+
+  export type CategoryScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CategoryScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CategoryScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CategoryScalarWhereWithAggregatesInput>
+    categoryID?: StringWithAggregatesFilter | string
+    type?: StringWithAggregatesFilter | string
   }
 
   export type TicketWhereInput = {
@@ -4123,7 +5121,8 @@ export namespace Prisma {
     title?: StringFilter | string
     createDate?: DateTimeFilter | Date | string
     updatedDate?: DateTimeFilter | Date | string
-    subject?: StringFilter | string
+    category?: XOR<CategoryRelationFilter, CategoryWhereInput> | null
+    categoryID?: StringFilter | string
     status?: EnumStatusFilter | Status
     description?: StringFilter | string
     User?: XOR<UserRelationFilter, UserWhereInput> | null
@@ -4131,17 +5130,19 @@ export namespace Prisma {
     feedback?: FeedbackListRelationFilter
   }
 
-  export type TicketOrderByWithRelationInput = {
+  export type TicketOrderByWithRelationAndSearchRelevanceInput = {
     tiket_id?: SortOrder
     title?: SortOrder
     createDate?: SortOrder
     updatedDate?: SortOrder
-    subject?: SortOrder
+    category?: CategoryOrderByWithRelationAndSearchRelevanceInput
+    categoryID?: SortOrder
     status?: SortOrder
     description?: SortOrder
-    User?: UserOrderByWithRelationInput
+    User?: UserOrderByWithRelationAndSearchRelevanceInput
     userId?: SortOrder
     feedback?: FeedbackOrderByRelationAggregateInput
+    _relevance?: TicketOrderByRelevanceInput
   }
 
   export type TicketWhereUniqueInput = {
@@ -4153,7 +5154,7 @@ export namespace Prisma {
     title?: SortOrder
     createDate?: SortOrder
     updatedDate?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
     status?: SortOrder
     description?: SortOrder
     userId?: SortOrder
@@ -4170,7 +5171,7 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter | string
     createDate?: DateTimeWithAggregatesFilter | Date | string
     updatedDate?: DateTimeWithAggregatesFilter | Date | string
-    subject?: StringWithAggregatesFilter | string
+    categoryID?: StringWithAggregatesFilter | string
     status?: EnumStatusWithAggregatesFilter | Status
     description?: StringWithAggregatesFilter | string
     userId?: StringWithAggregatesFilter | string
@@ -4189,14 +5190,15 @@ export namespace Prisma {
     User?: XOR<UserRelationFilter, UserWhereInput>
   }
 
-  export type FeedbackOrderByWithRelationInput = {
+  export type FeedbackOrderByWithRelationAndSearchRelevanceInput = {
     feedback_Id?: SortOrder
     feedback?: SortOrder
     submitDate?: SortOrder
-    Ticket?: TicketOrderByWithRelationInput
+    Ticket?: TicketOrderByWithRelationAndSearchRelevanceInput
     ticket_id?: SortOrder
     userId?: SortOrder
-    User?: UserOrderByWithRelationInput
+    User?: UserOrderByWithRelationAndSearchRelevanceInput
+    _relevance?: FeedbackOrderByRelevanceInput
   }
 
   export type FeedbackWhereUniqueInput = {
@@ -4231,7 +5233,7 @@ export namespace Prisma {
     email: string
     password: string
     roll?: Roll
-    subject?: string | null
+    category?: CategoryCreateNestedOneWithoutUserInput
     ticket?: TicketCreateNestedManyWithoutUserInput
     Feedback?: FeedbackCreateNestedManyWithoutUserInput
   }
@@ -4242,29 +5244,31 @@ export namespace Prisma {
     email: string
     password: string
     roll?: Roll
-    subject?: string | null
     ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     Feedback?: FeedbackUncheckedCreateNestedManyWithoutUserInput
+    categoryID?: string | null
   }
 
   export type UserUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUpdateOneWithoutUserNestedInput
     ticket?: TicketUpdateManyWithoutUserNestedInput
     Feedback?: FeedbackUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
     ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     Feedback?: FeedbackUncheckedUpdateManyWithoutUserNestedInput
+    categoryID?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserCreateManyInput = {
@@ -4273,23 +5277,67 @@ export namespace Prisma {
     email: string
     password: string
     roll?: Roll
-    subject?: string | null
+    categoryID?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    categoryID?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type CategoryCreateInput = {
+    categoryID?: string
+    type: string
+    Ticket?: TicketCreateNestedManyWithoutCategoryInput
+    User?: UserCreateNestedManyWithoutCategoryInput
+  }
+
+  export type CategoryUncheckedCreateInput = {
+    categoryID?: string
+    type: string
+    Ticket?: TicketUncheckedCreateNestedManyWithoutCategoryInput
+    User?: UserUncheckedCreateNestedManyWithoutCategoryInput
+  }
+
+  export type CategoryUpdateInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    Ticket?: TicketUpdateManyWithoutCategoryNestedInput
+    User?: UserUpdateManyWithoutCategoryNestedInput
+  }
+
+  export type CategoryUncheckedUpdateInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    Ticket?: TicketUncheckedUpdateManyWithoutCategoryNestedInput
+    User?: UserUncheckedUpdateManyWithoutCategoryNestedInput
+  }
+
+  export type CategoryCreateManyInput = {
+    categoryID?: string
+    type: string
+  }
+
+  export type CategoryUpdateManyMutationInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CategoryUncheckedUpdateManyInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
   }
 
   export type TicketCreateInput = {
@@ -4297,7 +5345,7 @@ export namespace Prisma {
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    category?: CategoryCreateNestedOneWithoutTicketInput
     status?: Status
     description: string
     User?: UserCreateNestedOneWithoutTicketInput
@@ -4309,7 +5357,7 @@ export namespace Prisma {
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    categoryID: string
     status?: Status
     description: string
     userId: string
@@ -4317,10 +5365,11 @@ export namespace Prisma {
   }
 
   export type TicketUpdateInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    category?: CategoryUpdateOneWithoutTicketNestedInput
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
     User?: UserUpdateOneWithoutTicketNestedInput
@@ -4328,10 +5377,11 @@ export namespace Prisma {
   }
 
   export type TicketUncheckedUpdateInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    categoryID?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -4343,26 +5393,27 @@ export namespace Prisma {
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    categoryID: string
     status?: Status
     description: string
     userId: string
   }
 
   export type TicketUpdateManyMutationInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
   }
 
   export type TicketUncheckedUpdateManyInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    categoryID?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -4385,6 +5436,7 @@ export namespace Prisma {
   }
 
   export type FeedbackUpdateInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     Ticket?: TicketUpdateOneWithoutFeedbackNestedInput
@@ -4392,6 +5444,7 @@ export namespace Prisma {
   }
 
   export type FeedbackUncheckedUpdateInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     ticket_id?: StringFieldUpdateOperationsInput | string
@@ -4407,11 +5460,13 @@ export namespace Prisma {
   }
 
   export type FeedbackUpdateManyMutationInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FeedbackUncheckedUpdateManyInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     ticket_id?: StringFieldUpdateOperationsInput | string
@@ -4429,6 +5484,7 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     mode?: QueryMode
     not?: NestedStringFilter | string
   }
@@ -4444,9 +5500,9 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     mode?: QueryMode
     not?: NestedStringNullableFilter | string | null
-    isSet?: boolean
   }
 
   export type EnumRollFilter = {
@@ -4454,6 +5510,11 @@ export namespace Prisma {
     in?: Enumerable<Roll>
     notIn?: Enumerable<Roll>
     not?: NestedEnumRollFilter | Roll
+  }
+
+  export type CategoryRelationFilter = {
+    is?: CategoryWhereInput | null
+    isNot?: CategoryWhereInput | null
   }
 
   export type TicketListRelationFilter = {
@@ -4476,13 +5537,19 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type UserOrderByRelevanceInput = {
+    fields: Enumerable<UserOrderByRelevanceFieldEnum>
+    sort: SortOrder
+    search: string
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
     password?: SortOrder
     roll?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -4491,7 +5558,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     roll?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -4500,7 +5567,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     roll?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
   }
 
   export type StringWithAggregatesFilter = {
@@ -4514,6 +5581,7 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     mode?: QueryMode
     not?: NestedStringWithAggregatesFilter | string
     _count?: NestedIntFilter
@@ -4532,12 +5600,12 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     mode?: QueryMode
     not?: NestedStringNullableWithAggregatesFilter | string | null
     _count?: NestedIntNullableFilter
     _min?: NestedStringNullableFilter
     _max?: NestedStringNullableFilter
-    isSet?: boolean
   }
 
   export type EnumRollWithAggregatesFilter = {
@@ -4548,6 +5616,37 @@ export namespace Prisma {
     _count?: NestedIntFilter
     _min?: NestedEnumRollFilter
     _max?: NestedEnumRollFilter
+  }
+
+  export type UserListRelationFilter = {
+    every?: UserWhereInput
+    some?: UserWhereInput
+    none?: UserWhereInput
+  }
+
+  export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CategoryOrderByRelevanceInput = {
+    fields: Enumerable<CategoryOrderByRelevanceFieldEnum>
+    sort: SortOrder
+    search: string
+  }
+
+  export type CategoryCountOrderByAggregateInput = {
+    categoryID?: SortOrder
+    type?: SortOrder
+  }
+
+  export type CategoryMaxOrderByAggregateInput = {
+    categoryID?: SortOrder
+    type?: SortOrder
+  }
+
+  export type CategoryMinOrderByAggregateInput = {
+    categoryID?: SortOrder
+    type?: SortOrder
   }
 
   export type DateTimeFilter = {
@@ -4573,12 +5672,18 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type TicketOrderByRelevanceInput = {
+    fields: Enumerable<TicketOrderByRelevanceFieldEnum>
+    sort: SortOrder
+    search: string
+  }
+
   export type TicketCountOrderByAggregateInput = {
     tiket_id?: SortOrder
     title?: SortOrder
     createDate?: SortOrder
     updatedDate?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
     status?: SortOrder
     description?: SortOrder
     userId?: SortOrder
@@ -4589,7 +5694,7 @@ export namespace Prisma {
     title?: SortOrder
     createDate?: SortOrder
     updatedDate?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
     status?: SortOrder
     description?: SortOrder
     userId?: SortOrder
@@ -4600,7 +5705,7 @@ export namespace Prisma {
     title?: SortOrder
     createDate?: SortOrder
     updatedDate?: SortOrder
-    subject?: SortOrder
+    categoryID?: SortOrder
     status?: SortOrder
     description?: SortOrder
     userId?: SortOrder
@@ -4635,6 +5740,12 @@ export namespace Prisma {
     isNot?: TicketWhereInput | null
   }
 
+  export type FeedbackOrderByRelevanceInput = {
+    fields: Enumerable<FeedbackOrderByRelevanceFieldEnum>
+    sort: SortOrder
+    search: string
+  }
+
   export type FeedbackCountOrderByAggregateInput = {
     feedback_Id?: SortOrder
     feedback?: SortOrder
@@ -4657,6 +5768,12 @@ export namespace Prisma {
     submitDate?: SortOrder
     ticket_id?: SortOrder
     userId?: SortOrder
+  }
+
+  export type CategoryCreateNestedOneWithoutUserInput = {
+    create?: XOR<CategoryCreateWithoutUserInput, CategoryUncheckedCreateWithoutUserInput>
+    connectOrCreate?: CategoryCreateOrConnectWithoutUserInput
+    connect?: CategoryWhereUniqueInput
   }
 
   export type TicketCreateNestedManyWithoutUserInput = {
@@ -4687,17 +5804,26 @@ export namespace Prisma {
     connect?: Enumerable<FeedbackWhereUniqueInput>
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-    unset?: boolean
-  }
-
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type EnumRollFieldUpdateOperationsInput = {
     set?: Roll
+  }
+
+  export type CategoryUpdateOneWithoutUserNestedInput = {
+    create?: XOR<CategoryCreateWithoutUserInput, CategoryUncheckedCreateWithoutUserInput>
+    connectOrCreate?: CategoryCreateOrConnectWithoutUserInput
+    upsert?: CategoryUpsertWithoutUserInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: CategoryWhereUniqueInput
+    update?: XOR<CategoryUpdateWithoutUserInput, CategoryUncheckedUpdateWithoutUserInput>
   }
 
   export type TicketUpdateManyWithoutUserNestedInput = {
@@ -4756,6 +5882,96 @@ export namespace Prisma {
     deleteMany?: Enumerable<FeedbackScalarWhereInput>
   }
 
+  export type TicketCreateNestedManyWithoutCategoryInput = {
+    create?: XOR<Enumerable<TicketCreateWithoutCategoryInput>, Enumerable<TicketUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<TicketCreateOrConnectWithoutCategoryInput>
+    createMany?: TicketCreateManyCategoryInputEnvelope
+    connect?: Enumerable<TicketWhereUniqueInput>
+  }
+
+  export type UserCreateNestedManyWithoutCategoryInput = {
+    create?: XOR<Enumerable<UserCreateWithoutCategoryInput>, Enumerable<UserUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutCategoryInput>
+    createMany?: UserCreateManyCategoryInputEnvelope
+    connect?: Enumerable<UserWhereUniqueInput>
+  }
+
+  export type TicketUncheckedCreateNestedManyWithoutCategoryInput = {
+    create?: XOR<Enumerable<TicketCreateWithoutCategoryInput>, Enumerable<TicketUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<TicketCreateOrConnectWithoutCategoryInput>
+    createMany?: TicketCreateManyCategoryInputEnvelope
+    connect?: Enumerable<TicketWhereUniqueInput>
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutCategoryInput = {
+    create?: XOR<Enumerable<UserCreateWithoutCategoryInput>, Enumerable<UserUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutCategoryInput>
+    createMany?: UserCreateManyCategoryInputEnvelope
+    connect?: Enumerable<UserWhereUniqueInput>
+  }
+
+  export type TicketUpdateManyWithoutCategoryNestedInput = {
+    create?: XOR<Enumerable<TicketCreateWithoutCategoryInput>, Enumerable<TicketUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<TicketCreateOrConnectWithoutCategoryInput>
+    upsert?: Enumerable<TicketUpsertWithWhereUniqueWithoutCategoryInput>
+    createMany?: TicketCreateManyCategoryInputEnvelope
+    set?: Enumerable<TicketWhereUniqueInput>
+    disconnect?: Enumerable<TicketWhereUniqueInput>
+    delete?: Enumerable<TicketWhereUniqueInput>
+    connect?: Enumerable<TicketWhereUniqueInput>
+    update?: Enumerable<TicketUpdateWithWhereUniqueWithoutCategoryInput>
+    updateMany?: Enumerable<TicketUpdateManyWithWhereWithoutCategoryInput>
+    deleteMany?: Enumerable<TicketScalarWhereInput>
+  }
+
+  export type UserUpdateManyWithoutCategoryNestedInput = {
+    create?: XOR<Enumerable<UserCreateWithoutCategoryInput>, Enumerable<UserUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutCategoryInput>
+    upsert?: Enumerable<UserUpsertWithWhereUniqueWithoutCategoryInput>
+    createMany?: UserCreateManyCategoryInputEnvelope
+    set?: Enumerable<UserWhereUniqueInput>
+    disconnect?: Enumerable<UserWhereUniqueInput>
+    delete?: Enumerable<UserWhereUniqueInput>
+    connect?: Enumerable<UserWhereUniqueInput>
+    update?: Enumerable<UserUpdateWithWhereUniqueWithoutCategoryInput>
+    updateMany?: Enumerable<UserUpdateManyWithWhereWithoutCategoryInput>
+    deleteMany?: Enumerable<UserScalarWhereInput>
+  }
+
+  export type TicketUncheckedUpdateManyWithoutCategoryNestedInput = {
+    create?: XOR<Enumerable<TicketCreateWithoutCategoryInput>, Enumerable<TicketUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<TicketCreateOrConnectWithoutCategoryInput>
+    upsert?: Enumerable<TicketUpsertWithWhereUniqueWithoutCategoryInput>
+    createMany?: TicketCreateManyCategoryInputEnvelope
+    set?: Enumerable<TicketWhereUniqueInput>
+    disconnect?: Enumerable<TicketWhereUniqueInput>
+    delete?: Enumerable<TicketWhereUniqueInput>
+    connect?: Enumerable<TicketWhereUniqueInput>
+    update?: Enumerable<TicketUpdateWithWhereUniqueWithoutCategoryInput>
+    updateMany?: Enumerable<TicketUpdateManyWithWhereWithoutCategoryInput>
+    deleteMany?: Enumerable<TicketScalarWhereInput>
+  }
+
+  export type UserUncheckedUpdateManyWithoutCategoryNestedInput = {
+    create?: XOR<Enumerable<UserCreateWithoutCategoryInput>, Enumerable<UserUncheckedCreateWithoutCategoryInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutCategoryInput>
+    upsert?: Enumerable<UserUpsertWithWhereUniqueWithoutCategoryInput>
+    createMany?: UserCreateManyCategoryInputEnvelope
+    set?: Enumerable<UserWhereUniqueInput>
+    disconnect?: Enumerable<UserWhereUniqueInput>
+    delete?: Enumerable<UserWhereUniqueInput>
+    connect?: Enumerable<UserWhereUniqueInput>
+    update?: Enumerable<UserUpdateWithWhereUniqueWithoutCategoryInput>
+    updateMany?: Enumerable<UserUpdateManyWithWhereWithoutCategoryInput>
+    deleteMany?: Enumerable<UserScalarWhereInput>
+  }
+
+  export type CategoryCreateNestedOneWithoutTicketInput = {
+    create?: XOR<CategoryCreateWithoutTicketInput, CategoryUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: CategoryCreateOrConnectWithoutTicketInput
+    connect?: CategoryWhereUniqueInput
+  }
+
   export type UserCreateNestedOneWithoutTicketInput = {
     create?: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
     connectOrCreate?: UserCreateOrConnectWithoutTicketInput
@@ -4778,6 +5994,16 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type CategoryUpdateOneWithoutTicketNestedInput = {
+    create?: XOR<CategoryCreateWithoutTicketInput, CategoryUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: CategoryCreateOrConnectWithoutTicketInput
+    upsert?: CategoryUpsertWithoutTicketInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: CategoryWhereUniqueInput
+    update?: XOR<CategoryUpdateWithoutTicketInput, CategoryUncheckedUpdateWithoutTicketInput>
   }
 
   export type EnumStatusFieldUpdateOperationsInput = {
@@ -4863,6 +6089,7 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     not?: NestedStringFilter | string
   }
 
@@ -4877,8 +6104,8 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     not?: NestedStringNullableFilter | string | null
-    isSet?: boolean
   }
 
   export type NestedEnumRollFilter = {
@@ -4899,6 +6126,7 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     not?: NestedStringWithAggregatesFilter | string
     _count?: NestedIntFilter
     _min?: NestedStringFilter
@@ -4927,11 +6155,11 @@ export namespace Prisma {
     contains?: string
     startsWith?: string
     endsWith?: string
+    search?: string
     not?: NestedStringNullableWithAggregatesFilter | string | null
     _count?: NestedIntNullableFilter
     _min?: NestedStringNullableFilter
     _max?: NestedStringNullableFilter
-    isSet?: boolean
   }
 
   export type NestedIntNullableFilter = {
@@ -4943,7 +6171,6 @@ export namespace Prisma {
     gt?: number
     gte?: number
     not?: NestedIntNullableFilter | number | null
-    isSet?: boolean
   }
 
   export type NestedEnumRollWithAggregatesFilter = {
@@ -4998,12 +6225,29 @@ export namespace Prisma {
     _max?: NestedEnumStatusFilter
   }
 
+  export type CategoryCreateWithoutUserInput = {
+    categoryID?: string
+    type: string
+    Ticket?: TicketCreateNestedManyWithoutCategoryInput
+  }
+
+  export type CategoryUncheckedCreateWithoutUserInput = {
+    categoryID?: string
+    type: string
+    Ticket?: TicketUncheckedCreateNestedManyWithoutCategoryInput
+  }
+
+  export type CategoryCreateOrConnectWithoutUserInput = {
+    where: CategoryWhereUniqueInput
+    create: XOR<CategoryCreateWithoutUserInput, CategoryUncheckedCreateWithoutUserInput>
+  }
+
   export type TicketCreateWithoutUserInput = {
     tiket_id?: string
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    category?: CategoryCreateNestedOneWithoutTicketInput
     status?: Status
     description: string
     feedback?: FeedbackCreateNestedManyWithoutTicketInput
@@ -5014,7 +6258,7 @@ export namespace Prisma {
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    categoryID: string
     status?: Status
     description: string
     feedback?: FeedbackUncheckedCreateNestedManyWithoutTicketInput
@@ -5027,6 +6271,7 @@ export namespace Prisma {
 
   export type TicketCreateManyUserInputEnvelope = {
     data: Enumerable<TicketCreateManyUserInput>
+    skipDuplicates?: boolean
   }
 
   export type FeedbackCreateWithoutUserInput = {
@@ -5050,6 +6295,24 @@ export namespace Prisma {
 
   export type FeedbackCreateManyUserInputEnvelope = {
     data: Enumerable<FeedbackCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
+  export type CategoryUpsertWithoutUserInput = {
+    update: XOR<CategoryUpdateWithoutUserInput, CategoryUncheckedUpdateWithoutUserInput>
+    create: XOR<CategoryCreateWithoutUserInput, CategoryUncheckedCreateWithoutUserInput>
+  }
+
+  export type CategoryUpdateWithoutUserInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    Ticket?: TicketUpdateManyWithoutCategoryNestedInput
+  }
+
+  export type CategoryUncheckedUpdateWithoutUserInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    Ticket?: TicketUncheckedUpdateManyWithoutCategoryNestedInput
   }
 
   export type TicketUpsertWithWhereUniqueWithoutUserInput = {
@@ -5076,7 +6339,7 @@ export namespace Prisma {
     title?: StringFilter | string
     createDate?: DateTimeFilter | Date | string
     updatedDate?: DateTimeFilter | Date | string
-    subject?: StringFilter | string
+    categoryID?: StringFilter | string
     status?: EnumStatusFilter | Status
     description?: StringFilter | string
     userId?: StringFilter | string
@@ -5109,13 +6372,136 @@ export namespace Prisma {
     userId?: StringFilter | string
   }
 
+  export type TicketCreateWithoutCategoryInput = {
+    tiket_id?: string
+    title: string
+    createDate?: Date | string
+    updatedDate?: Date | string
+    status?: Status
+    description: string
+    User?: UserCreateNestedOneWithoutTicketInput
+    feedback?: FeedbackCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketUncheckedCreateWithoutCategoryInput = {
+    tiket_id?: string
+    title: string
+    createDate?: Date | string
+    updatedDate?: Date | string
+    status?: Status
+    description: string
+    userId: string
+    feedback?: FeedbackUncheckedCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketCreateOrConnectWithoutCategoryInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutCategoryInput, TicketUncheckedCreateWithoutCategoryInput>
+  }
+
+  export type TicketCreateManyCategoryInputEnvelope = {
+    data: Enumerable<TicketCreateManyCategoryInput>
+    skipDuplicates?: boolean
+  }
+
+  export type UserCreateWithoutCategoryInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    roll?: Roll
+    ticket?: TicketCreateNestedManyWithoutUserInput
+    Feedback?: FeedbackCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutCategoryInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    roll?: Roll
+    ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    Feedback?: FeedbackUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutCategoryInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCategoryInput, UserUncheckedCreateWithoutCategoryInput>
+  }
+
+  export type UserCreateManyCategoryInputEnvelope = {
+    data: Enumerable<UserCreateManyCategoryInput>
+    skipDuplicates?: boolean
+  }
+
+  export type TicketUpsertWithWhereUniqueWithoutCategoryInput = {
+    where: TicketWhereUniqueInput
+    update: XOR<TicketUpdateWithoutCategoryInput, TicketUncheckedUpdateWithoutCategoryInput>
+    create: XOR<TicketCreateWithoutCategoryInput, TicketUncheckedCreateWithoutCategoryInput>
+  }
+
+  export type TicketUpdateWithWhereUniqueWithoutCategoryInput = {
+    where: TicketWhereUniqueInput
+    data: XOR<TicketUpdateWithoutCategoryInput, TicketUncheckedUpdateWithoutCategoryInput>
+  }
+
+  export type TicketUpdateManyWithWhereWithoutCategoryInput = {
+    where: TicketScalarWhereInput
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutTicketInput>
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutCategoryInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutCategoryInput, UserUncheckedUpdateWithoutCategoryInput>
+    create: XOR<UserCreateWithoutCategoryInput, UserUncheckedCreateWithoutCategoryInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutCategoryInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutCategoryInput, UserUncheckedUpdateWithoutCategoryInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutCategoryInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type UserScalarWhereInput = {
+    AND?: Enumerable<UserScalarWhereInput>
+    OR?: Enumerable<UserScalarWhereInput>
+    NOT?: Enumerable<UserScalarWhereInput>
+    id?: StringFilter | string
+    name?: StringNullableFilter | string | null
+    email?: StringFilter | string
+    password?: StringFilter | string
+    roll?: EnumRollFilter | Roll
+    categoryID?: StringNullableFilter | string | null
+  }
+
+  export type CategoryCreateWithoutTicketInput = {
+    categoryID?: string
+    type: string
+    User?: UserCreateNestedManyWithoutCategoryInput
+  }
+
+  export type CategoryUncheckedCreateWithoutTicketInput = {
+    categoryID?: string
+    type: string
+    User?: UserUncheckedCreateNestedManyWithoutCategoryInput
+  }
+
+  export type CategoryCreateOrConnectWithoutTicketInput = {
+    where: CategoryWhereUniqueInput
+    create: XOR<CategoryCreateWithoutTicketInput, CategoryUncheckedCreateWithoutTicketInput>
+  }
+
   export type UserCreateWithoutTicketInput = {
     id?: string
     name?: string | null
     email: string
     password: string
     roll?: Roll
-    subject?: string | null
+    category?: CategoryCreateNestedOneWithoutUserInput
     Feedback?: FeedbackCreateNestedManyWithoutUserInput
   }
 
@@ -5125,8 +6511,8 @@ export namespace Prisma {
     email: string
     password: string
     roll?: Roll
-    subject?: string | null
     Feedback?: FeedbackUncheckedCreateNestedManyWithoutUserInput
+    categoryID?: string | null
   }
 
   export type UserCreateOrConnectWithoutTicketInput = {
@@ -5155,6 +6541,24 @@ export namespace Prisma {
 
   export type FeedbackCreateManyTicketInputEnvelope = {
     data: Enumerable<FeedbackCreateManyTicketInput>
+    skipDuplicates?: boolean
+  }
+
+  export type CategoryUpsertWithoutTicketInput = {
+    update: XOR<CategoryUpdateWithoutTicketInput, CategoryUncheckedUpdateWithoutTicketInput>
+    create: XOR<CategoryCreateWithoutTicketInput, CategoryUncheckedCreateWithoutTicketInput>
+  }
+
+  export type CategoryUpdateWithoutTicketInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    User?: UserUpdateManyWithoutCategoryNestedInput
+  }
+
+  export type CategoryUncheckedUpdateWithoutTicketInput = {
+    categoryID?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    User?: UserUncheckedUpdateManyWithoutCategoryNestedInput
   }
 
   export type UserUpsertWithoutTicketInput = {
@@ -5163,21 +6567,23 @@ export namespace Prisma {
   }
 
   export type UserUpdateWithoutTicketInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUpdateOneWithoutUserNestedInput
     Feedback?: FeedbackUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTicketInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
     Feedback?: FeedbackUncheckedUpdateManyWithoutUserNestedInput
+    categoryID?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type FeedbackUpsertWithWhereUniqueWithoutTicketInput = {
@@ -5201,7 +6607,7 @@ export namespace Prisma {
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    category?: CategoryCreateNestedOneWithoutTicketInput
     status?: Status
     description: string
     User?: UserCreateNestedOneWithoutTicketInput
@@ -5212,7 +6618,7 @@ export namespace Prisma {
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    categoryID: string
     status?: Status
     description: string
     userId: string
@@ -5229,7 +6635,7 @@ export namespace Prisma {
     email: string
     password: string
     roll?: Roll
-    subject?: string | null
+    category?: CategoryCreateNestedOneWithoutUserInput
     ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
@@ -5239,8 +6645,8 @@ export namespace Prisma {
     email: string
     password: string
     roll?: Roll
-    subject?: string | null
     ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    categoryID?: string | null
   }
 
   export type UserCreateOrConnectWithoutFeedbackInput = {
@@ -5254,20 +6660,22 @@ export namespace Prisma {
   }
 
   export type TicketUpdateWithoutFeedbackInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    category?: CategoryUpdateOneWithoutTicketNestedInput
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
     User?: UserUpdateOneWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutFeedbackInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    categoryID?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -5279,21 +6687,23 @@ export namespace Prisma {
   }
 
   export type UserUpdateWithoutFeedbackInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUpdateOneWithoutUserNestedInput
     ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFeedbackInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     roll?: EnumRollFieldUpdateOperationsInput | Roll
-    subject?: NullableStringFieldUpdateOperationsInput | string | null
     ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    categoryID?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketCreateManyUserInput = {
@@ -5301,7 +6711,7 @@ export namespace Prisma {
     title: string
     createDate?: Date | string
     updatedDate?: Date | string
-    subject: string
+    categoryID: string
     status?: Status
     description: string
   }
@@ -5314,50 +6724,124 @@ export namespace Prisma {
   }
 
   export type TicketUpdateWithoutUserInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    category?: CategoryUpdateOneWithoutTicketNestedInput
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
     feedback?: FeedbackUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutUserInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    categoryID?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
     feedback?: FeedbackUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateManyWithoutTicketInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     createDate?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    subject?: StringFieldUpdateOperationsInput | string
+    categoryID?: StringFieldUpdateOperationsInput | string
     status?: EnumStatusFieldUpdateOperationsInput | Status
     description?: StringFieldUpdateOperationsInput | string
   }
 
   export type FeedbackUpdateWithoutUserInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     Ticket?: TicketUpdateOneWithoutFeedbackNestedInput
   }
 
   export type FeedbackUncheckedUpdateWithoutUserInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     ticket_id?: StringFieldUpdateOperationsInput | string
   }
 
   export type FeedbackUncheckedUpdateManyWithoutFeedbackInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     ticket_id?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TicketCreateManyCategoryInput = {
+    tiket_id?: string
+    title: string
+    createDate?: Date | string
+    updatedDate?: Date | string
+    status?: Status
+    description: string
+    userId: string
+  }
+
+  export type UserCreateManyCategoryInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    roll?: Roll
+  }
+
+  export type TicketUpdateWithoutCategoryInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    createDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | Status
+    description?: StringFieldUpdateOperationsInput | string
+    User?: UserUpdateOneWithoutTicketNestedInput
+    feedback?: FeedbackUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateWithoutCategoryInput = {
+    tiket_id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    createDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | Status
+    description?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    feedback?: FeedbackUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
+  export type UserUpdateWithoutCategoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    roll?: EnumRollFieldUpdateOperationsInput | Roll
+    ticket?: TicketUpdateManyWithoutUserNestedInput
+    Feedback?: FeedbackUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCategoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    roll?: EnumRollFieldUpdateOperationsInput | Roll
+    ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    Feedback?: FeedbackUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    roll?: EnumRollFieldUpdateOperationsInput | Roll
   }
 
   export type FeedbackCreateManyTicketInput = {
@@ -5368,12 +6852,14 @@ export namespace Prisma {
   }
 
   export type FeedbackUpdateWithoutTicketInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     User?: UserUpdateOneRequiredWithoutFeedbackNestedInput
   }
 
   export type FeedbackUncheckedUpdateWithoutTicketInput = {
+    feedback_Id?: StringFieldUpdateOperationsInput | string
     feedback?: StringFieldUpdateOperationsInput | string
     submitDate?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string

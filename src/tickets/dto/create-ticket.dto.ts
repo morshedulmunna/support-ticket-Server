@@ -2,6 +2,7 @@
 import { Prisma, Status } from 'prisma/generated';
 
 export class CreateTicketDto implements Prisma.TicketUncheckedCreateInput {
+  categoryID: string;
   tiket_id?: string;
   title: string;
   createDate?: string | Date;

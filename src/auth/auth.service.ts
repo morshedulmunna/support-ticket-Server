@@ -68,7 +68,7 @@ export class AuthService {
       user: {
         name: foundUser.name,
         email: foundUser.email,
-        subject: foundUser.subject,
+        category: foundUser.categoryID,
         roll: foundUser.roll,
       },
     };

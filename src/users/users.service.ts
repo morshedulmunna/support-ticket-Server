@@ -52,12 +52,16 @@ export class UsersService {
     return { foundUser };
   }
 
-  async userUpdateForAdmin(id: string, roll, subject: string) {
+  async userUpdateForAdmin(id: string, roll, category: string) {
     return this.prisma.user.update({
       where: { id },
       data: {
         roll: roll,
-        subject: subject,
+        category: {
+          create: {
+            type: category,
+          },
+        },
       },
     });
   }

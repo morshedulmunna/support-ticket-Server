@@ -26,7 +26,7 @@ export class TicketsService {
   async getAllTicket(id: string) {
     const admin = await this.prisma.user.findUnique({ where: { id } });
 
-    if (admin.subject === null) {
+    if (admin.categoryID === null) {
       const tickets = await this.prisma.ticket.findMany();
       if (admin.roll === 'admin') {
         return tickets;
@@ -34,7 +34,7 @@ export class TicketsService {
     } else {
       const tickets = await this.prisma.ticket.findMany({
         where: {
-          subject: admin.subject,
+          categoryID: admin.categoryID,
         },
       });
       if (admin.roll === 'admin') {

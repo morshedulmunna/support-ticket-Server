@@ -89,6 +89,23 @@ Prisma.NullTypes = {
 // https://github.com/microsoft/TypeScript/issues/3192#issuecomment-261720275
 function makeEnum(x) { return x; }
 
+exports.Prisma.CategoryOrderByRelevanceFieldEnum = makeEnum({
+  categoryID: 'categoryID',
+  type: 'type'
+});
+
+exports.Prisma.CategoryScalarFieldEnum = makeEnum({
+  categoryID: 'categoryID',
+  type: 'type'
+});
+
+exports.Prisma.FeedbackOrderByRelevanceFieldEnum = makeEnum({
+  feedback_Id: 'feedback_Id',
+  feedback: 'feedback',
+  ticket_id: 'ticket_id',
+  userId: 'userId'
+});
+
 exports.Prisma.FeedbackScalarFieldEnum = makeEnum({
   feedback_Id: 'feedback_Id',
   feedback: 'feedback',
@@ -107,15 +124,38 @@ exports.Prisma.SortOrder = makeEnum({
   desc: 'desc'
 });
 
+exports.Prisma.TicketOrderByRelevanceFieldEnum = makeEnum({
+  tiket_id: 'tiket_id',
+  title: 'title',
+  categoryID: 'categoryID',
+  description: 'description',
+  userId: 'userId'
+});
+
 exports.Prisma.TicketScalarFieldEnum = makeEnum({
   tiket_id: 'tiket_id',
   title: 'title',
   createDate: 'createDate',
   updatedDate: 'updatedDate',
-  subject: 'subject',
+  categoryID: 'categoryID',
   status: 'status',
   description: 'description',
   userId: 'userId'
+});
+
+exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
+  Serializable: 'Serializable'
+});
+
+exports.Prisma.UserOrderByRelevanceFieldEnum = makeEnum({
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  password: 'password',
+  categoryID: 'categoryID'
 });
 
 exports.Prisma.UserScalarFieldEnum = makeEnum({
@@ -124,7 +164,7 @@ exports.Prisma.UserScalarFieldEnum = makeEnum({
   email: 'email',
   password: 'password',
   roll: 'roll',
-  subject: 'subject'
+  categoryID: 'categoryID'
 });
 exports.Roll = makeEnum({
   customer: 'customer',
@@ -139,6 +179,7 @@ exports.Status = makeEnum({
 
 exports.Prisma.ModelName = makeEnum({
   User: 'User',
+  Category: 'Category',
   Ticket: 'Ticket',
   Feedback: 'Feedback'
 });

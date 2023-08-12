@@ -1,13 +1,13 @@
-import { AuthGuard } from '@nestjs/passport';
 import {
-  Controller,
-  Post,
-  Get,
   Body,
+  Controller,
+  Get,
+  Post,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dtio/auth.dto';
 import { LoginAuthDto } from './dtio/loginAuth.dto';

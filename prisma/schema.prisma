@@ -8,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -24,35 +24,44 @@ enum Status {
 }
 
 model User {
-  id       String     @id @default(auto()) @map("_id") @db.ObjectId
-  name     String?
-  email    String     @unique
-  password String
-  roll     Roll       @default(customer)
-  subject  String?
-  ticket   Ticket[]
-  Feedback Feedback[]
+  id         String     @id @default(cuid())
+  name       String?
+  email      String     @unique
+  password   String
+  roll       Roll       @default(customer)
+  category   Category?  @relation(fields: [categoryID], references: [categoryID])
+  ticket     Ticket[]
+  Feedback   Feedback[]
+  categoryID String?
+}
+
+model Category {
+  categoryID String   @id @default(cuid())
+  type       String
+  Ticket     Ticket[]
+  User       User[]
 }
 
 model Ticket {
-  tiket_id    String     @id @default(auto()) @map("_id") @db.ObjectId
+  tiket_id    String     @id @default(cuid())
   title       String
   createDate  DateTime   @default(now())
   updatedDate DateTime   @updatedAt
-  subject     String
+  category    Category?  @relation(fields: [categoryID], references: [categoryID])
+  categoryID  String
   status      Status     @default(open)
   description String
   User        User?      @relation(fields: [userId], references: [id])
-  userId      String     @db.ObjectId
+  userId      String
   feedback    Feedback[]
 }
 
 model Feedback {
-  feedback_Id String   @id @default(auto()) @map("_id") @db.ObjectId
+  feedback_Id String   @id @default(cuid())
   feedback    String
   submitDate  DateTime @default(now())
   Ticket      Ticket?  @relation(fields: [ticket_id], references: [tiket_id], onDelete: Cascade, onUpdate: Cascade)
-  ticket_id   String   @db.ObjectId
-  userId      String   @db.ObjectId
+  ticket_id   String
+  userId      String
   User        User     @relation(fields: [userId], references: [id])
 }
