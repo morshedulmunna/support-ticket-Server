@@ -14,10 +14,23 @@ export class TicketsService {
     if (customer.roll !== 'customer') {
       throw new Error('Unauthorized User can not create tickets');
     }
+
+    console.log(createTicketDto);
+
     return await this.prisma.ticket.create({
       data: {
-        ...createTicketDto,
-        userId: id,
+        title: createTicketDto.title,
+        description: createTicketDto.description || '',
+        category: {
+          connect: {
+            categoryID: createTicketDto.categoryID,
+          },
+        },
+        User: {
+          connect: {
+            id,
+          },
+        },
       },
     });
   }
