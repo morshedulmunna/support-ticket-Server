@@ -58,13 +58,24 @@ export class UsersService {
     return { foundUser };
   }
 
-  async userUpdateForAdmin(id: string, roll: any) {
-    return this.prisma.user.update({
-      where: { id },
+  async userUpdateForAdmin(body: any) {
+    const { id, roll, assign_to } = body;
+
+    const res = this.prisma.user.update({
+      where: {
+        id: body.id,
+      },
       data: {
-        roll,
+        roll: 'assistance', // Update the roll field with the new value
+        assign_to: {
+          connect: {
+            categoryID: assign_to,
+          },
+        }, // Update the assign_to field with the new value
       },
     });
+
+    return res;
   }
 
   async assistance(id: string) {
@@ -81,5 +92,17 @@ export class UsersService {
         roll: 'assistance',
       },
     });
+  }
+
+  async deleteUser(id: string) {
+    await this.prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    return {
+      message: `Deleted successfully`,
+    };
   }
 }

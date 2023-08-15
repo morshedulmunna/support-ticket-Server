@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -46,14 +47,19 @@ export class UsersController {
 
   // When super admin create a new admin and submit the make admin button then call this part
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  userUpdateForAdmin(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  @Patch()
+  userUpdateForAdmin(@Body() updateUserDto: UpdateUserDto) {
     try {
-      const { roll, subject } = updateUserDto;
-      return this.usersService.userUpdateForAdmin(id, roll);
+      return this.usersService.userUpdateForAdmin(updateUserDto);
+    } catch {
+      throw new NotFoundException('User Not Found');
+    }
+  }
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  deleteUser(@Param('id') id: string) {
+    try {
+      return this.usersService.deleteUser(id);
     } catch {
       throw new NotFoundException('User Not Found');
     }
