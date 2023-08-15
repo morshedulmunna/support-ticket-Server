@@ -27,4 +27,13 @@ export class CategoryService {
   async getAllCategory() {
     return this.prisma.category.findMany({});
   }
+  async categoryDeleteByID(id: string) {
+    console.log(id);
+
+    return this.prisma.category.delete({
+      where: {
+        categoryID: id,
+      },
+    });
+  }
 }
