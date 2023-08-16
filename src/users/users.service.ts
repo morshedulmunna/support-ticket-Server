@@ -30,6 +30,7 @@ export class UsersService {
         name: true,
         email: true,
         roll: true,
+        assign_to: true,
       },
       orderBy: {
         createAt: 'desc',
