@@ -40,14 +40,9 @@ export class TicketsService {
     const admin = await this.prisma.user.findUnique({ where: { id } });
 
     if (admin.categoryID === null) {
-      const tickets = await this.prisma.ticket.findMany();
-      if (admin.roll === 'admin') {
-        return tickets;
-      }
-    } else {
       const tickets = await this.prisma.ticket.findMany({
-        where: {
-          categoryID: admin.categoryID,
+        include: {
+          category: true,
         },
       });
       if (admin.roll === 'admin') {
@@ -71,6 +66,9 @@ export class TicketsService {
           userId,
         },
       },
+      include: {
+        category: true,
+      },
     });
   }
 
@@ -84,6 +82,33 @@ export class TicketsService {
         },
       },
     });
+  }
+  // aLL Close tickets
+  async getAllTicketsByRoll(userId: string) {
+    const assign_type = await this.prisma.user.findFirstOrThrow({
+      where: {
+        id: userId,
+      },
+    });
+
+    try {
+      const res = await this.prisma.ticket.findMany({
+        where: {
+          category: {
+            categoryID: assign_type.categoryID,
+          },
+        },
+        include: {
+          category: true,
+        },
+      });
+
+      return res;
+    } catch (e) {
+      return {
+        message: 'Not Found',
+      };
+    }
   }
 
   // Get Single Ticket Details

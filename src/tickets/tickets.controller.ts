@@ -55,6 +55,12 @@ export class TicketsController {
   getSingleUserCloseTicket(@GetCurrentUserById() id: string) {
     return this.ticketsService.getSingleUserCloseTicket(id);
   }
+  // Single User All Close Tickets
+  @UseGuards(JwtAuthGuard)
+  @Get('ticketsByRoll')
+  getAllTicketsByRoll(@GetCurrentUserById() id: string) {
+    return this.ticketsService.getAllTicketsByRoll(id);
+  }
 
   // Get Single Tickets by Id
   @UseGuards(JwtAuthGuard)
