@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from 'prisma/generated';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
 
 @Injectable()
 export class TicketsService {
@@ -17,7 +16,7 @@ export class TicketsService {
 
     console.log(createTicketDto);
 
-    return await this.prisma.ticket.create({
+    await this.prisma.ticket.create({
       data: {
         title: createTicketDto.title,
         description: createTicketDto.description || '',
@@ -33,81 +32,94 @@ export class TicketsService {
         },
       },
     });
+
+    return {
+      message: 'success',
+    };
   }
 
-  // Admin Get All Customers Tickets Here
-  async getAllTicket(id: string) {
-    const admin = await this.prisma.user.findUnique({ where: { id } });
+  // Admin Get All Customers Open Tickets
+  async getOpenTicket(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
 
-    if (admin.categoryID === null) {
-      const tickets = await this.prisma.ticket.findMany({
-        include: {
-          category: true,
-        },
-      });
-      if (admin.roll === 'admin') {
+    switch (user.roll) {
+      case 'customer': {
+        const tickets = await this.prisma.ticket.findMany({
+          where: {
+            status: 'open',
+            userId: id,
+          },
+          include: {
+            category: true,
+          },
+        });
+        return tickets;
+      }
+      case 'admin': {
+        const tickets = await this.prisma.ticket.findMany({
+          where: {
+            status: 'open',
+          },
+          include: {
+            category: true,
+          },
+        });
+        return tickets;
+      }
+      case 'assistance': {
+        const tickets = await this.prisma.ticket.findMany({
+          where: {
+            status: 'open',
+            categoryID: user.categoryID,
+          },
+          include: {
+            category: true,
+          },
+        });
         return tickets;
       }
     }
   }
 
-  async getSingleUserTicket(userId: string) {
-    return this.prisma.ticket.findMany({
-      where: { userId },
-    });
-  }
+  async getCloseTicket(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
 
-  // aLL open tickets
-  async getSingleUserOpenTicket(userId: string) {
-    return this.prisma.ticket.findMany({
-      where: {
-        AND: {
-          status: 'open',
-          userId,
-        },
-      },
-      include: {
-        category: true,
-      },
-    });
-  }
-
-  // aLL Close tickets
-  async getSingleUserCloseTicket(userId: string) {
-    return this.prisma.ticket.findMany({
-      where: {
-        AND: {
-          status: 'close',
-          userId,
-        },
-      },
-    });
-  }
-  // aLL Close tickets
-  async getAllTicketsByRoll(userId: string) {
-    const assign_type = await this.prisma.user.findFirstOrThrow({
-      where: {
-        id: userId,
-      },
-    });
-
-    try {
-      const res = await this.prisma.ticket.findMany({
-        where: {
-          category: {
-            categoryID: assign_type.categoryID,
+    switch (user.roll) {
+      case 'customer': {
+        const tickets = await this.prisma.ticket.findMany({
+          where: {
+            status: 'close',
+            userId: id,
           },
-        },
-        include: {
-          category: true,
-        },
-      });
-
-      return res;
-    } catch (e) {
-      return {
-        message: 'Not Found',
-      };
+          include: {
+            category: true,
+          },
+        });
+        return tickets;
+      }
+      case 'admin': {
+        const tickets = await this.prisma.ticket.findMany({
+          where: {
+            status: 'close',
+          },
+          include: {
+            category: true,
+          },
+        });
+        return tickets;
+      }
+      case 'assistance': {
+        const tickets = await this.prisma.ticket.findMany({
+          where: {
+            status: 'close',
+            categoryID: user.categoryID,
+          },
+          include: {
+            category: true,
+          },
+        });
+        return tickets;
+      }
     }
   }
 
@@ -124,15 +136,19 @@ export class TicketsService {
   }
 
   // Get ticketUpdate Service
-  async ticketUpdate(tiket_id: string, updateArticleDto: UpdateTicketDto) {
+  async ticketUpdate(tiket_id: string) {
     return this.prisma.ticket.update({
       where: { tiket_id },
-      data: updateArticleDto,
+      data: {
+        status: 'close',
+      },
     });
   }
 
   // Get ticketUpdate Service
   async ticketRemove(tiket_id: string) {
+    console.log(tiket_id);
+
     return this.prisma.ticket.delete({
       where: { tiket_id },
     });

@@ -11,7 +11,6 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { GetCurrentUserById } from 'src/utils';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketsService } from './tickets.service';
 
 @Controller('tickets')
@@ -28,38 +27,18 @@ export class TicketsController {
     return this.ticketsService.createTicket(createTicketDto, id);
   }
 
-  // Admin Get All Customers Tickets Here
+  // getting Open Tickets
   @UseGuards(JwtAuthGuard)
-  @Get()
-  getAllTicket(@GetCurrentUserById() id: string) {
-    return this.ticketsService.getAllTicket(id);
+  @Get('open')
+  getOpenTicket(@GetCurrentUserById() id: string) {
+    return this.ticketsService.getOpenTicket(id);
   }
 
-  // Single User All Tickets
+  // getting Close Tickets
   @UseGuards(JwtAuthGuard)
-  @Get('single_user_ticket')
-  getSingleUserTicket(@GetCurrentUserById() id: string) {
-    return this.ticketsService.getSingleUserTicket(id);
-  }
-
-  // Single User All Open Tickets
-  @UseGuards(JwtAuthGuard)
-  @Get('open-ticket')
-  getSingleUserOpenTicket(@GetCurrentUserById() id: string) {
-    return this.ticketsService.getSingleUserOpenTicket(id);
-  }
-
-  // Single User All Close Tickets
-  @UseGuards(JwtAuthGuard)
-  @Get('close-ticket')
-  getSingleUserCloseTicket(@GetCurrentUserById() id: string) {
-    return this.ticketsService.getSingleUserCloseTicket(id);
-  }
-  // Single User All Close Tickets
-  @UseGuards(JwtAuthGuard)
-  @Get('ticketsByRoll')
-  getAllTicketsByRoll(@GetCurrentUserById() id: string) {
-    return this.ticketsService.getAllTicketsByRoll(id);
+  @Get('close')
+  getCloseTicket(@GetCurrentUserById() id: string) {
+    return this.ticketsService.getCloseTicket(id);
   }
 
   // Get Single Tickets by Id
@@ -72,11 +51,8 @@ export class TicketsController {
   // Update TIckets by Id
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  ticketUpdate(
-    @Param('id') id: string,
-    @Body() updateArticleDto: UpdateTicketDto,
-  ) {
-    return this.ticketsService.ticketUpdate(id, updateArticleDto);
+  ticketUpdate(@Param('id') id: string) {
+    return this.ticketsService.ticketUpdate(id);
   }
 
   // Delete Ticket by ID
