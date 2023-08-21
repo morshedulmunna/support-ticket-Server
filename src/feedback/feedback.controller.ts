@@ -10,13 +10,11 @@ export class FeedbackController {
   @UseGuards(JwtAuthGuard)
   @Post(':id')
   createFeedback(
-    @Body() feedback: string,
+    @Body() { feedback }: any,
     @Param('id') id: string,
     @GetCurrentUserById() UserId: string,
   ) {
-    //TODO=> Getting id and feedback
-    // return this.feedbackService.createFeedback(feedback, id, UserId);
-    console.log(feedback, id, UserId);
+    return this.feedbackService.createFeedback(feedback, id, UserId);
   }
 
   @UseGuards(JwtAuthGuard)

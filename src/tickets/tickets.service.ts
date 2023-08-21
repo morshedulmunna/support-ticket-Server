@@ -52,6 +52,9 @@ export class TicketsService {
           include: {
             category: true,
           },
+          orderBy: {
+            createDate: 'desc',
+          },
         });
         return tickets;
       }
@@ -62,6 +65,9 @@ export class TicketsService {
           },
           include: {
             category: true,
+          },
+          orderBy: {
+            createDate: 'desc',
           },
         });
         return tickets;
@@ -74,6 +80,9 @@ export class TicketsService {
           },
           include: {
             category: true,
+          },
+          orderBy: {
+            createDate: 'desc',
           },
         });
         return tickets;
