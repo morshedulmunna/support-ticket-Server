@@ -6,9 +6,10 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { UsersModule } from './users/users.module';
 import { CategoryModule } from './category/category.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, TicketsModule, FeedbackModule, CategoryModule],
+  imports: [AuthModule, UsersModule, TicketsModule, FeedbackModule, CategoryModule, SearchModule],
   controllers: [AppController],
   providers: [PrismaClient],
 })
