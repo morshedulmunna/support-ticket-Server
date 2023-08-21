@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { FeedbackService } from './feedback.service';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { GetCurrentUserById } from 'src/utils';
+import { FeedbackService } from './feedback.service';
 
 @Controller('feedback')
 export class FeedbackController {
@@ -11,11 +10,13 @@ export class FeedbackController {
   @UseGuards(JwtAuthGuard)
   @Post(':id')
   createFeedback(
-    @Body() createFeedbackDto: CreateFeedbackDto,
+    @Body() feedback: string,
     @Param('id') id: string,
     @GetCurrentUserById() UserId: string,
   ) {
-    return this.feedbackService.createFeedback(createFeedbackDto, id, UserId);
+    //TODO=> Getting id and feedback
+    // return this.feedbackService.createFeedback(feedback, id, UserId);
+    console.log(feedback, id, UserId);
   }
 
   @UseGuards(JwtAuthGuard)

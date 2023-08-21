@@ -59,11 +59,13 @@ model Ticket {
 }
 
 model Feedback {
-  feedback_Id String   @id @default(cuid())
+  feedback_Id String @id @default(cuid())
   feedback    String
-  submitDate  DateTime @default(now())
-  Ticket      Ticket?  @relation(fields: [ticket_id], references: [tiket_id], onDelete: Cascade, onUpdate: Cascade)
-  ticket_id   String
-  userId      String
-  User        User     @relation(fields: [userId], references: [id])
+
+  submitDate DateTime @default(now())
+
+  Ticket    Ticket? @relation(fields: [ticket_id], references: [tiket_id], onDelete: Cascade, onUpdate: Cascade)
+  ticket_id String
+  userId    String
+  User      User    @relation(fields: [userId], references: [id])
 }
