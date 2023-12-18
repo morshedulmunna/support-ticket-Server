@@ -29,7 +29,7 @@ model User {
   name       String?
   email      String     @unique
   password   String
-  roll       Roll       @default(customer)
+  roll       Roll       @default(admin)
   createAt   DateTime   @default(now())
   ticket     Ticket[]
   Feedback   Feedback[]
